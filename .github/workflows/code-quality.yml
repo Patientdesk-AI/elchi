@@ -35,7 +35,7 @@ concurrency:
 
 jobs:
   code-quality:
-    runs-on: ubuntu-latest
+    runs-on: namespace-profile-patientdesk
     steps:
       - uses: actions/checkout@v5
 

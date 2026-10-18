@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   playwright:
-    runs-on: ubuntu-latest
+    runs-on: namespace-profile-patientdesk
     steps:
       - uses: actions/checkout@v5
 

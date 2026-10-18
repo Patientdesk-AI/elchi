@@ -54,7 +54,7 @@ jobs:
 
   comment-on-pr:
     needs: build-test
-    runs-on: ubuntu-latest
+    runs-on: namespace-profile-patientdesk
     permissions:
       pull-requests: write
     steps:
