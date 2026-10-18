@@ -312,3 +312,10 @@ Elchi also builds on:
 Elchi is released under the MIT license. See [LICENSE](LICENSE), which keeps the original Handy copyright notice alongside ours.
 
 Duyu-small is released separately under the Apache-2.0 license. See its [model page](https://huggingface.co/KaanAydinli/Duyu-small).
+
+## CI runner infrastructure
+
+Portable Linux jobs run on Namespace. Ubuntu 24.04 jobs use
+`namespace-profile-patientdesk`; version- or architecture-specific Linux builds
+use explicit `nscloud` labels to retain their build environment. macOS, Windows,
+and machine-local self-hosted jobs retain their specialized runners.

@@ -35,7 +35,7 @@ concurrency:
 
 jobs:
   nix-build:
-    runs-on: ubuntu-24.04
+    runs-on: namespace-profile-patientdesk
     continue-on-error: false
     steps:
       - uses: actions/checkout@v5
