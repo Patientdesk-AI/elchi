@@ -90,7 +90,22 @@ const MoreMenu: React.FC<{
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [asking, setAsking] = useState(false);
+  // Opened from the keyboard: focus goes to the first item, as in a native menu.
+  const [focusFirst, setFocusFirst] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const menu = useRef<HTMLDivElement>(null);
+
+  const items = () =>
+    Array.from(
+      menu.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? [],
+    );
+  // Closing unmounts the focused item; hand focus back to "⋯" so keyboard users keep
+  // their place.
+  const close = (refocus: boolean) => {
+    setOpen(false);
+    if (refocus) trigger.current?.focus();
+  };
 
   useEffect(() => {
     if (!open) {
@@ -100,17 +115,46 @@ const MoreMenu: React.FC<{
     const away = (e: MouseEvent) => {
       if (!ref.current?.contains(e.target as Node)) setOpen(false);
     };
-    const esc = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
     document.addEventListener("mousedown", away);
-    document.addEventListener("keydown", esc);
-    return () => {
-      document.removeEventListener("mousedown", away);
-      document.removeEventListener("keydown", esc);
-    };
+    return () => document.removeEventListener("mousedown", away);
   }, [open]);
 
+  useEffect(() => {
+    if (open && focusFirst) {
+      items()[0]?.focus();
+      setFocusFirst(false);
+    }
+  }, [open, focusFirst]);
+
+  const onTriggerKey = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " " || e.key === "ArrowDown") {
+      e.preventDefault();
+      setOpen(true);
+      setFocusFirst(true);
+    } else if (e.key === "Escape" && open) {
+      e.preventDefault();
+      close(true);
+    }
+  };
+  const onMenuKey = (e: React.KeyboardEvent) => {
+    const all = items();
+    const at = all.indexOf(document.activeElement as HTMLElement);
+    const move = (to: number) => {
+      e.preventDefault();
+      all[(to + all.length) % all.length]?.focus();
+    };
+    if (e.key === "ArrowDown") move(at + 1);
+    else if (e.key === "ArrowUp") move(at - 1);
+    else if (e.key === "Home") move(0);
+    else if (e.key === "End") move(all.length - 1);
+    else if (e.key === "Escape") {
+      e.preventDefault();
+      close(true);
+    } else if (e.key === "Tab") close(false);
+  };
+
   const pick = (fn: () => void) => () => {
-    setOpen(false);
+    close(true);
     fn();
   };
   const item =
@@ -119,9 +163,11 @@ const MoreMenu: React.FC<{
   return (
     <div ref={ref} className="relative">
       <button
+        ref={trigger}
         type="button"
         className={`${square} w-8 text-text/70`}
         onClick={() => setOpen((v) => !v)}
+        onKeyDown={onTriggerKey}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={t("meetings.more")}
@@ -131,7 +177,10 @@ const MoreMenu: React.FC<{
       </button>
       {open && (
         <div
+          ref={menu}
           role="menu"
+          aria-label={t("meetings.more")}
+          onKeyDown={onMenuKey}
           className="steel-panel !rounded-[10px] absolute end-0 top-[calc(100%+6px)] z-20 py-1.5 min-w-[210px] overflow-hidden"
         >
           {transcript && (
@@ -159,30 +208,28 @@ const MoreMenu: React.FC<{
           {(transcript || recordingPath) && (
             <div className="my-1.5 mx-3.5 hairline-t" aria-hidden="true" />
           )}
-          {asking ? (
-            <button
-              role="menuitem"
-              type="button"
-              className={`${item} bg-error/10 hover:!bg-error/15 text-error`}
-              onClick={pick(onDelete)}
-            >
-              {shared
-                ? t("meetings.share.deleteConfirm")
-                : t("meetings.deleteAsk")}
-              <span className="rounded-md bg-error text-white px-2 py-[3px] text-[12px] font-medium">
-                {t("meetings.delete")}
-              </span>
-            </button>
-          ) : (
-            <button
-              role="menuitem"
-              type="button"
-              className={`${item} text-error`}
-              onClick={() => setAsking(true)}
-            >
-              {t("meetings.delete")}
-            </button>
-          )}
+          {/* One element for both steps, so focus stays on it when it asks. */}
+          <button
+            role="menuitem"
+            type="button"
+            className={`${item} text-error ${
+              asking ? "bg-error/10 hover:!bg-error/15" : ""
+            }`}
+            onClick={asking ? pick(onDelete) : () => setAsking(true)}
+          >
+            {asking ? (
+              <>
+                {shared
+                  ? t("meetings.share.deleteConfirm")
+                  : t("meetings.deleteAsk")}
+                <span className="rounded-md bg-error text-white px-2 py-[3px] text-[12px] font-medium">
+                  {t("meetings.delete")}
+                </span>
+              </>
+            ) : (
+              t("meetings.delete")
+            )}
+          </button>
         </div>
       )}
     </div>
@@ -202,7 +249,11 @@ export const NotesHeader: React.FC<{
   titleShown: boolean;
   filter?: { onlyMine: boolean; onChange: (onlyMine: boolean) => void };
   onCopy?: () => Promise<void>;
-  share?: { shared: boolean; pro: boolean; onShare: () => void };
+  /** The meeting has a public link. Kept apart from `share`: a meeting can be shared
+   *  while the button is hidden (its notes being rewritten), and deleting it still
+   *  takes the link down, so the delete warning must know. */
+  shared: boolean;
+  share?: { pro: boolean; onShare: () => void };
   transcript?: { shown: boolean; count: number; onToggle: () => void };
   recordingPath: string | null;
   onDelete: () => void;
@@ -214,6 +265,7 @@ export const NotesHeader: React.FC<{
   titleShown,
   filter,
   onCopy,
+  shared,
   share,
   transcript,
   recordingPath,
@@ -256,7 +308,7 @@ export const NotesHeader: React.FC<{
             className="chrome-cta !rounded-lg h-8 w-[108px] inline-flex items-center justify-center gap-1.5 text-[12.5px] whitespace-nowrap cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
             onClick={share.onShare}
           >
-            {share.shared ? (
+            {shared ? (
               <>
                 <span
                   className="h-1.5 w-1.5 rounded-full bg-accent"
@@ -279,7 +331,7 @@ export const NotesHeader: React.FC<{
         <MoreMenu
           transcript={transcript}
           recordingPath={recordingPath}
-          shared={share?.shared ?? false}
+          shared={shared}
           onDelete={onDelete}
         />
       </div>

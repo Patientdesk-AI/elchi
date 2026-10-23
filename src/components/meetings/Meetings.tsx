@@ -600,10 +600,10 @@ const MeetingView: React.FC<{ id: number; onBack: () => void }> = ({
           m.notes && anyMine ? { onlyMine, onChange: setOnlyMine } : undefined
         }
         onCopy={m.notes || detail.segments.length > 0 ? copy : undefined}
+        shared={!!m.share_url}
         share={
           shareable
             ? {
-                shared: !!m.share_url,
                 pro,
                 onShare: () => setSharing(true),
               }
