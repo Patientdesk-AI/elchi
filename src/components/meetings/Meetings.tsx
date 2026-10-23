@@ -17,6 +17,7 @@ import { ChipButton, GhostButton } from "../home/FeedRow";
 import { MiniPlayer } from "../home/MiniPlayer";
 import { useIsDark } from "../home/useIsDark";
 import { dayKey } from "../home/text";
+import { NotesHeader } from "./NotesHeader";
 import { ShareDialog } from "./ShareDialog";
 import {
   openTasks,
@@ -488,6 +489,10 @@ const MeetingView: React.FC<{ id: number; onBack: () => void }> = ({
   const [onlyMine, setOnlyMine] = useState(false);
   const [showTranscript, setShowTranscript] = useState(false);
   const [sharing, setSharing] = useState(false);
+  // The header shows the title once the page's own title has scrolled out of view.
+  const [titleShown, setTitleShown] = useState(false);
+  const scroller = useRef<HTMLElement>(null);
+  const heading = useRef<HTMLHeadingElement>(null);
   const [audio, setAudio] = useState<{
     me: string | null;
     them: string | null;
@@ -518,6 +523,17 @@ const MeetingView: React.FC<{ id: number; onBack: () => void }> = ({
     ]).then(([me, them]) => setAudio({ me, them }));
   }, [id, detail?.meeting.kept]);
 
+  const loaded = detail !== null;
+  useEffect(() => {
+    if (!loaded || !heading.current) return;
+    const seen = new IntersectionObserver(
+      ([entry]) => setTitleShown(!entry.isIntersecting),
+      { root: scroller.current },
+    );
+    seen.observe(heading.current);
+    return () => seen.disconnect();
+  }, [loaded]);
+
   if (!detail) return null;
   const m = detail.meeting;
   const sections = m.notes ? parseNotes(m.notes, m.user_notes) : [];
@@ -531,11 +547,19 @@ const MeetingView: React.FC<{ id: number; onBack: () => void }> = ({
     setDetail({ ...detail, meeting: { ...m, notes } });
     await commands.setMeetingNotes(id, notes);
   };
+  // The notes, or without them the transcript, one line per utterance.
   const copy = async () => {
+    const body =
+      m.notes ??
+      detail.segments
+        .map(
+          (s) =>
+            `${s.speaker === "me" ? t("meetings.me") : t("meetings.them")}: ${s.text}`,
+        )
+        .join("\n");
     await navigator.clipboard.writeText(
-      [m.title && `# ${m.title}`, m.notes].filter(Boolean).join("\n\n"),
+      [m.title && `# ${m.title}`, body].filter(Boolean).join("\n\n"),
     );
-    toast.success(t("meetings.copied"));
   };
   const retry = async () => {
     const r = await commands.retryMeetingNotes(id);
@@ -558,38 +582,45 @@ const MeetingView: React.FC<{ id: number; onBack: () => void }> = ({
 
   return (
     <>
-      <Bar back={t("meetings.title")} onBack={onBack}>
-        {anyMine && (
-          <label className="flex items-center gap-2 text-[12.5px] text-mid-gray cursor-pointer max-[720px]:hidden">
-            <input
-              type="checkbox"
-              checked={onlyMine}
-              onChange={(e) => setOnlyMine(e.target.checked)}
-              className="h-4 w-4 accent-[color:var(--color-accent)]"
-            />
-            {t("meetings.onlyMine")}
-          </label>
-        )}
-        {m.notes && (
-          <ChipButton onClick={copy}>{t("meetings.copy")}</ChipButton>
-        )}
-        {shareable && (
-          <ChipButton onClick={() => setSharing(true)}>
-            {m.share_url
-              ? t("meetings.share.shared")
-              : t("meetings.share.button")}
-          </ChipButton>
-        )}
-        <ConfirmButton
-          label={t("meetings.delete")}
-          confirm={
-            m.share_url
-              ? t("meetings.share.deleteConfirm")
-              : t("meetings.deleteConfirm")
-          }
-          onConfirm={remove}
-        />
-      </Bar>
+      <NotesHeader
+        back={t("meetings.title")}
+        onBack={onBack}
+        title={m.title.trim() || t("meetings.untitled")}
+        meta={[
+          new Date(m.started_at * 1000).toLocaleDateString(i18n.language, {
+            day: "numeric",
+            month: "long",
+          }),
+          minutes !== null && t("meetings.minutes", { count: minutes }),
+        ]
+          .filter(Boolean)
+          .join(" · ")}
+        titleShown={titleShown}
+        filter={
+          m.notes && anyMine ? { onlyMine, onChange: setOnlyMine } : undefined
+        }
+        onCopy={m.notes || detail.segments.length > 0 ? copy : undefined}
+        shared={!!m.share_url}
+        share={
+          shareable
+            ? {
+                pro,
+                onShare: () => setSharing(true),
+              }
+            : undefined
+        }
+        transcript={
+          m.notes && detail.segments.length > 0
+            ? {
+                shown: showTranscript,
+                count: detail.segments.length,
+                onToggle: () => setShowTranscript((v) => !v),
+              }
+            : undefined
+        }
+        recordingPath={audio.me ?? audio.them}
+        onDelete={remove}
+      />
       {sharing && (
         <ShareDialog
           meeting={m}
@@ -598,9 +629,12 @@ const MeetingView: React.FC<{ id: number; onBack: () => void }> = ({
         />
       )}
 
-      <main className="flex-1 overflow-y-auto">
+      <main ref={scroller} className="flex-1 overflow-y-auto">
         <div className="max-w-[700px] mx-auto px-7 max-[720px]:px-5 pt-12 pb-14 flex flex-col gap-4">
-          <h1 className="text-[32px] leading-tight tracking-[-0.02em] font-medium select-text">
+          <h1
+            ref={heading}
+            className="text-[32px] leading-tight tracking-[-0.02em] font-medium select-text"
+          >
             {m.title.trim() || t("meetings.untitled")}
           </h1>
           <p className={mono}>

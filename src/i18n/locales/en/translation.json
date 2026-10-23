@@ -1092,10 +1092,19 @@
     "upgrade": "Get Duyu Pro",
     "retry": "Write the notes",
     "recording": "Recording",
-    "copy": "Copy notes",
-    "copied": "Notes copied.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "more": "More actions",
+    "revealRecording": "Show recording in folder",
+    "proTag": "PRO",
+    "filter": {
+      "label": "Notes shown",
+      "all": "All",
+      "mine": "What I wrote",
+      "mineShort": "Mine"
+    },
     "delete": "Delete",
-    "deleteConfirm": "Sure? Delete",
+    "deleteAsk": "Sure?",
     "past": "Past meetings",
     "startFailed": "Couldn't start the meeting: {{error}}",
     "status": {
@@ -1144,7 +1153,6 @@
       "mine": "What you wrote",
       "elchi": "What Elchi added from the meeting"
     },
-    "onlyMine": "Only what I wrote",
     "showTranscript_one": "Show transcript · {{count}} line",
     "showTranscript_other": "Show transcript · {{count}} lines",
     "hideTranscript": "Hide transcript",
