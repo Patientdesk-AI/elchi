@@ -1092,10 +1092,19 @@
     "upgrade": "Duyu Pro'ya geç",
     "retry": "Notları yaz",
     "recording": "Ses kaydı",
-    "copy": "Notları kopyala",
-    "copied": "Notlar kopyalandı.",
+    "copy": "Kopyala",
+    "copied": "Kopyalandı",
+    "more": "Diğer işlemler",
+    "revealRecording": "Ses kaydını klasörde göster",
+    "proTag": "PRO",
+    "filter": {
+      "label": "Gösterilen notlar",
+      "all": "Tümü",
+      "mine": "Benim yazdıklarım",
+      "mineShort": "Benim"
+    },
     "delete": "Sil",
-    "deleteConfirm": "Emin misin? Sil",
+    "deleteAsk": "Emin misin?",
     "past": "Geçmiş toplantılar",
     "startFailed": "Toplantı başlatılamadı: {{error}}",
     "status": {
@@ -1144,7 +1153,6 @@
       "mine": "Senin yazdığın",
       "elchi": "Elchi'nin toplantıdan eklediği"
     },
-    "onlyMine": "Yalnızca benim yazdıklarım",
     "showTranscript_one": "Dökümü göster · {{count}} satır",
     "showTranscript_other": "Dökümü göster · {{count}} satır",
     "hideTranscript": "Dökümü gizle",
