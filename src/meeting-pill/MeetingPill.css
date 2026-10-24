@@ -1,5 +1,9 @@
-/* The meeting pill (MeetingPill.tsx). The window is transparent and sized by the backend:
-   the pill alone, or the pill with the transcript panel to its left. */
+/* The meeting pill (MeetingPill.tsx). The window is transparent and sized by the backend
+   (src-tauri/src/meeting/pill.rs): the pill alone, or the pill with the transcript panel
+   to its left. The window leaves room around them because macOS cuts off whatever is
+   drawn past its edge: 16px each side (this padding, SIDE in pill.rs) and at least 30px
+   above and below. Keep every shadow within that: no more than 16px sideways
+   (blur + spread) and 30px down (offset + blur + spread). */
 
 .mp-stage {
   height: 100vh;
@@ -7,7 +11,7 @@
   align-items: center;
   justify-content: flex-end;
   gap: 12px;
-  padding: 0 6px;
+  padding: 0 16px;
   box-sizing: border-box;
   font-family: "Geist Variable", "Geist", system-ui, sans-serif;
   -webkit-user-select: none;
@@ -54,11 +58,11 @@
 .mp-panel {
   flex: none;
   width: 380px;
-  height: calc(100vh - 20px);
+  height: calc(100vh - 64px);
   border-radius: 22px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(30, 31, 37, 0.97);
-  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 14px 30px -14px rgba(0, 0, 0, 0.8);
   padding: 16px;
   box-sizing: border-box;
   overflow-y: auto;
@@ -149,7 +153,7 @@
   border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(30, 31, 37, 0.97);
-  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 14px 30px -14px rgba(0, 0, 0, 0.8);
   padding: 14px 14px 12px 16px;
   box-sizing: border-box;
   color: #ffffff;

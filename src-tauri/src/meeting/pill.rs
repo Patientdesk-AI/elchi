@@ -24,14 +24,19 @@ use tauri::{AppHandle, Emitter, Manager};
 
 pub const LABEL: &str = "meeting_pill";
 
+/// The window is transparent and macOS clips whatever is drawn past its edge, so each
+/// size leaves room around the pill, card or panel for their CSS shadows to fade out:
+/// SIDE on the left and right (the stage's padding in MeetingPill.css, which also keeps
+/// the pill off the screen's edge) and at least 30px above and below.
+const SIDE: f64 = 16.0;
+/// The pill itself (`.mp-pill`), at the window's right, vertically centred.
+const PILL: (f64, f64) = (48.0, 88.0);
 /// Logical sizes: the pill alone, and the pill with the transcript panel to its left.
-const COLLAPSED: (f64, f64) = (64.0, 104.0);
-const EXPANDED: (f64, f64) = (470.0, 560.0);
+const COLLAPSED: (f64, f64) = (PILL.0 + 2.0 * SIDE, 152.0);
+const EXPANDED: (f64, f64) = (472.0, 604.0);
 /// A question alone at the pill's spot, and one beside the pill.
-const ASK: (f64, f64) = (384.0, 150.0);
-const ASK_STOP: (f64, f64) = (470.0, 150.0);
-/// Gap between the pill and the screen's right edge.
-const EDGE: f64 = 10.0;
+const ASK: (f64, f64) = (392.0, 210.0);
+const ASK_STOP: (f64, f64) = (452.0, 210.0);
 
 static WATCHING: AtomicBool = AtomicBool::new(false);
 /// A question is on screen; the transcript does not open on hover meanwhile.
@@ -63,8 +68,9 @@ tauri_nspanel::tauri_panel! {
     })
 }
 
-/// Where the window goes for a size: flush right, centred on the same height either way,
-/// so the pill does not move when the panel opens.
+/// Where the window goes for a size: flush with the screen's right edge (SIDE inside it
+/// keeps the pill off the edge), centred on the same height either way, so the pill does
+/// not move when the panel opens.
 fn frame(app: &AppHandle, (w, h): (f64, f64)) -> Option<(f64, f64)> {
     let monitor = app.primary_monitor().ok()??;
     let scale = monitor.scale_factor();
@@ -76,7 +82,7 @@ fn frame(app: &AppHandle, (w, h): (f64, f64)) -> Option<(f64, f64)> {
         monitor.size().width as f64 / scale,
         monitor.size().height as f64 / scale,
     );
-    Some((mx + mw - w - EDGE, my + (mh - h) / 2.0))
+    Some((mx + mw - w, my + (mh - h) / 2.0))
 }
 
 fn place(app: &AppHandle, size: (f64, f64)) {
@@ -252,15 +258,17 @@ fn watch(app: AppHandle) {
                 continue;
             };
             let scale = window.scale_factor().unwrap_or(1.0);
-            // The pill is the right-hand COLLAPSED-wide strip of the window, vertically centred.
-            let pill_w = COLLAPSED.0 * scale;
-            let pill_h = COLLAPSED.1 * scale;
+            // The pill sits SIDE in from the window's right edge, vertically centred; the
+            // room around it for its shadow does not count.
+            let side = SIDE * scale;
+            let pill_w = PILL.0 * scale;
+            let pill_h = PILL.1 * scale;
             let (wx, wy) = (pos.x as f64, pos.y as f64);
             let (ww, wh) = (size.width as f64, size.height as f64);
             let in_window =
                 cursor.x >= wx && cursor.x < wx + ww && cursor.y >= wy && cursor.y < wy + wh;
-            let on_pill = cursor.x >= wx + ww - pill_w
-                && cursor.x < wx + ww
+            let on_pill = cursor.x >= wx + ww - side - pill_w
+                && cursor.x < wx + ww - side
                 && cursor.y >= wy + (wh - pill_h) / 2.0
                 && cursor.y < wy + (wh + pill_h) / 2.0;
             if !open && on_pill {
