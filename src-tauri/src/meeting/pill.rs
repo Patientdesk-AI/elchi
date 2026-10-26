@@ -24,14 +24,19 @@ use tauri::{AppHandle, Emitter, Manager};
 
 pub const LABEL: &str = "meeting_pill";
 
+/// The window is transparent and macOS clips whatever is drawn past its edge, so each
+/// size leaves room around the pill, card or panel for their CSS shadows to fade out:
+/// SIDE on the left and right (the stage's padding in MeetingPill.css, which also keeps
+/// the pill off the screen's edge) and at least 30px above and below.
+const SIDE: f64 = 16.0;
+/// The pill itself (`.mp-pill`), at the window's right, vertically centred.
+const PILL: (f64, f64) = (48.0, 88.0);
 /// Logical sizes: the pill alone, and the pill with the transcript panel to its left.
-const COLLAPSED: (f64, f64) = (64.0, 104.0);
-const EXPANDED: (f64, f64) = (470.0, 560.0);
+const COLLAPSED: (f64, f64) = (PILL.0 + 2.0 * SIDE, 152.0);
+const EXPANDED: (f64, f64) = (472.0, 604.0);
 /// A question alone at the pill's spot, and one beside the pill.
-const ASK: (f64, f64) = (384.0, 150.0);
-const ASK_STOP: (f64, f64) = (470.0, 150.0);
-/// Gap between the pill and the screen's right edge.
-const EDGE: f64 = 10.0;
+const ASK: (f64, f64) = (392.0, 210.0);
+const ASK_STOP: (f64, f64) = (452.0, 210.0);
 
 static WATCHING: AtomicBool = AtomicBool::new(false);
 /// A question is on screen; the transcript does not open on hover meanwhile.
@@ -63,8 +68,9 @@ tauri_nspanel::tauri_panel! {
     })
 }
 
-/// Where the window goes for a size: flush right, centred on the same height either way,
-/// so the pill does not move when the panel opens.
+/// Where the window goes for a size: flush with the screen's right edge (SIDE inside it
+/// keeps the pill off the edge), centred on the same height either way, so the pill does
+/// not move when the panel opens.
 fn frame(app: &AppHandle, (w, h): (f64, f64)) -> Option<(f64, f64)> {
     let monitor = app.primary_monitor().ok()??;
     let scale = monitor.scale_factor();
@@ -76,7 +82,7 @@ fn frame(app: &AppHandle, (w, h): (f64, f64)) -> Option<(f64, f64)> {
         monitor.size().width as f64 / scale,
         monitor.size().height as f64 / scale,
     );
-    Some((mx + mw - w - EDGE, my + (mh - h) / 2.0))
+    Some((mx + mw - w, my + (mh - h) / 2.0))
 }
 
 fn place(app: &AppHandle, size: (f64, f64)) {
@@ -225,6 +231,25 @@ pub fn clear_prompt(app: &AppHandle) {
     });
 }
 
+/// A window's frame in physical pixels: x, y, width, height.
+type Frame = (f64, f64, f64, f64);
+
+/// Whether a cursor (physical pixels) is anywhere in the window.
+fn in_frame((x, y): (f64, f64), (wx, wy, ww, wh): Frame) -> bool {
+    x >= wx && x < wx + ww && y >= wy && y < wy + wh
+}
+
+/// Whether a cursor (physical pixels) is over the pill itself: SIDE in from the window's
+/// right edge, vertically centred. The transparent room around it for its shadow does not
+/// count, so passing near the pill does not open the transcript.
+fn on_pill((x, y): (f64, f64), (wx, wy, ww, wh): Frame, scale: f64) -> bool {
+    let (side, pill_w, pill_h) = (SIDE * scale, PILL.0 * scale, PILL.1 * scale);
+    x >= wx + ww - side - pill_w
+        && x < wx + ww - side
+        && y >= wy + (wh - pill_h) / 2.0
+        && y < wy + (wh + pill_h) / 2.0
+}
+
 /// Opens the transcript while the cursor is over the pill, closes it once the cursor has
 /// left the open window for a moment (so passing over the gap does not flicker it).
 fn watch(app: AppHandle) {
@@ -252,18 +277,15 @@ fn watch(app: AppHandle) {
                 continue;
             };
             let scale = window.scale_factor().unwrap_or(1.0);
-            // The pill is the right-hand COLLAPSED-wide strip of the window, vertically centred.
-            let pill_w = COLLAPSED.0 * scale;
-            let pill_h = COLLAPSED.1 * scale;
-            let (wx, wy) = (pos.x as f64, pos.y as f64);
-            let (ww, wh) = (size.width as f64, size.height as f64);
-            let in_window =
-                cursor.x >= wx && cursor.x < wx + ww && cursor.y >= wy && cursor.y < wy + wh;
-            let on_pill = cursor.x >= wx + ww - pill_w
-                && cursor.x < wx + ww
-                && cursor.y >= wy + (wh - pill_h) / 2.0
-                && cursor.y < wy + (wh + pill_h) / 2.0;
-            if !open && on_pill {
+            let frame = (
+                pos.x as f64,
+                pos.y as f64,
+                size.width as f64,
+                size.height as f64,
+            );
+            let point = (cursor.x, cursor.y);
+            let in_window = in_frame(point, frame);
+            if !open && on_pill(point, frame, scale) {
                 open = true;
                 outside = 0;
                 place(&app, EXPANDED);
@@ -286,4 +308,116 @@ fn watch(app: AppHandle) {
 pub fn open_meeting_from_pill(app: AppHandle) {
     crate::show_main_window(&app);
     let _ = app.emit("open-meetings", ());
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// A window of a logical size at a physical origin, as the watcher sees it.
+    fn frame_of((w, h): (f64, f64), scale: f64) -> Frame {
+        (1000.0, 400.0, w * scale, h * scale)
+    }
+
+    /// A point given in logical pixels from the window's top-left, in physical pixels.
+    fn at(frame: Frame, scale: f64, (x, y): (f64, f64)) -> (f64, f64) {
+        (frame.0 + x * scale, frame.1 + y * scale)
+    }
+
+    #[test]
+    fn hover_opens_only_over_the_pill_itself() {
+        for scale in [1.0, 2.0] {
+            for size in [COLLAPSED, EXPANDED] {
+                let frame = frame_of(size, scale);
+                let (w, h) = size;
+                let left = w - SIDE - PILL.0;
+                let top = (h - PILL.1) / 2.0;
+                let is = |x, y| on_pill(at(frame, scale, (x, y)), frame, scale);
+
+                // Its centre and its top-left corner count; its far edges do not.
+                assert!(
+                    is(left + PILL.0 / 2.0, h / 2.0),
+                    "{size:?} @{scale}x centre"
+                );
+                assert!(is(left, top), "{size:?} @{scale}x top-left corner");
+                assert!(!is(left + PILL.0, h / 2.0), "{size:?} @{scale}x right edge");
+                assert!(
+                    !is(left + PILL.0 / 2.0, top + PILL.1),
+                    "{size:?} @{scale}x bottom edge"
+                );
+
+                // The transparent room for the shadow does not open the transcript:
+                // beside the pill toward the screen's edge, and above and below it.
+                assert!(
+                    !is(w - SIDE / 2.0, h / 2.0),
+                    "{size:?} @{scale}x right margin"
+                );
+                assert!(
+                    !is(left + PILL.0 / 2.0, top / 2.0),
+                    "{size:?} @{scale}x above"
+                );
+                assert!(
+                    !is(left + PILL.0 / 2.0, h - top / 2.0),
+                    "{size:?} @{scale}x below"
+                );
+                assert!(!is(left - 1.0, h / 2.0), "{size:?} @{scale}x left of it");
+            }
+        }
+    }
+
+    #[test]
+    fn the_window_counts_its_margin_as_inside() {
+        // Keeping the transcript open while the cursor crosses the gap to the panel relies
+        // on the whole window, margin included, counting as inside.
+        for scale in [1.0, 2.0] {
+            let frame = frame_of(EXPANDED, scale);
+            assert!(in_frame(at(frame, scale, (1.0, 1.0)), frame));
+            assert!(in_frame(
+                at(frame, scale, (EXPANDED.0 - 1.0, EXPANDED.1 - 1.0)),
+                frame
+            ));
+            assert!(!in_frame(at(frame, scale, (EXPANDED.0, 10.0)), frame));
+            assert!(!in_frame(at(frame, scale, (-1.0, 10.0)), frame));
+        }
+    }
+
+    /// The value of `property` in the first CSS rule for `selector`, in px.
+    fn css_px(css: &str, selector: &str, property: &str) -> f64 {
+        let rule = css
+            .split(&format!("{selector} {{"))
+            .nth(1)
+            .and_then(|r| r.split('}').next())
+            .unwrap_or_else(|| panic!("no rule for {selector}"));
+        let value = rule
+            .lines()
+            .find_map(|l| l.trim().strip_prefix(&format!("{property}:")))
+            .unwrap_or_else(|| panic!("no {property} in {selector}"));
+        value
+            .trim()
+            .trim_end_matches(';')
+            .split_whitespace()
+            .last()
+            .and_then(|v| v.strip_suffix("px"))
+            .and_then(|v| v.parse().ok())
+            .unwrap_or_else(|| panic!("{selector} {property} is not in px: {value}"))
+    }
+
+    #[test]
+    fn window_sizes_match_the_pill_css() {
+        // The hover check and the window sizes assume the page's layout; a change on
+        // either side must be made on both.
+        let css = include_str!("../../../src/meeting-pill/MeetingPill.css");
+        assert_eq!(css_px(css, ".mp-pill", "width"), PILL.0);
+        assert_eq!(css_px(css, ".mp-pill", "height"), PILL.1);
+        assert_eq!(css_px(css, ".mp-stage", "padding"), SIDE);
+        let gap = css_px(css, ".mp-stage", "gap");
+        let panel = css_px(css, ".mp-panel", "width");
+        let card = css_px(css, ".mp-ask", "width");
+        assert_eq!(COLLAPSED.0, SIDE + PILL.0 + SIDE);
+        assert_eq!(EXPANDED.0, SIDE + panel + gap + PILL.0 + SIDE);
+        assert_eq!(ASK.0, SIDE + card + SIDE);
+        assert_eq!(ASK_STOP.0, SIDE + card + gap + PILL.0 + SIDE);
+        // Room above and below the pill for its shadow.
+        assert!((COLLAPSED.1 - PILL.1) / 2.0 >= 30.0);
+    }
 }
