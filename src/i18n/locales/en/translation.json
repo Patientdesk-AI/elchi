@@ -286,6 +286,7 @@
         "none": "No shortcuts configured",
         "notFound": "Shortcut not found",
         "pressKeys": "Press keys...",
+        "change": "Change shortcut",
         "bindings": {
           "transcribe": {
             "name": "Transcribe Shortcut",

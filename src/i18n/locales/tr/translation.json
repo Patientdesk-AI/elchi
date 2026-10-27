@@ -330,6 +330,7 @@
         "none": "Kısayol ayarlanmadı",
         "notFound": "Kısayol bulunamadı",
         "pressKeys": "Tuşlara basın...",
+        "change": "Kısayolu değiştir",
         "bindings": {
           "transcribe": {
             "name": "Dikte kısayolu",

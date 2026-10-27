@@ -1,4 +1,6 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
+import { Pencil } from "lucide-react";
 import { Kbd } from "../ui/Kbd";
 import { formatKeyCombination, type OSType } from "../../lib/utils/keyboard";
 
@@ -60,8 +62,9 @@ interface ShortcutButtonProps {
 }
 
 /**
- * The clickable keycap group of a shortcut row. While recording it becomes a
- * blue-rimmed steel well that reads "Tuşlara basın…" / the live combination.
+ * The clickable keycap group of a shortcut row: the keycaps and a blue pencil in one
+ * steel chip, so it reads as something to change rather than a label. While recording
+ * it becomes a blue-rimmed steel well that reads "Tuşlara basın…" / the live combination.
  */
 export const ShortcutButton: React.FC<ShortcutButtonProps> = ({
   binding,
@@ -73,6 +76,7 @@ export const ShortcutButton: React.FC<ShortcutButtonProps> = ({
   label,
   recorderRef,
 }) => {
+  const { t } = useTranslation();
   if (recording) {
     return (
       <button
@@ -93,10 +97,17 @@ export const ShortcutButton: React.FC<ShortcutButtonProps> = ({
       type="button"
       onClick={onStart}
       disabled={disabled}
-      aria-label={label}
-      className="rounded-[6px] p-0.5 -m-0.5 cursor-pointer hover:brightness-125 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+      aria-label={`${label}: ${t("settings.general.shortcut.change")}`}
+      title={t("settings.general.shortcut.change")}
+      className="group steel-chip !rounded-lg inline-flex items-center gap-2 ps-1.5 pe-1 py-1 cursor-pointer hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
     >
       <ShortcutKeys binding={binding} osType={osType} />
+      <span
+        aria-hidden="true"
+        className="grid place-items-center w-6 h-6 rounded-md bg-accent text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_2px_8px_rgba(33,64,255,0.45)] group-hover:brightness-115"
+      >
+        <Pencil className="w-3.5 h-3.5" strokeWidth={2.25} />
+      </span>
     </button>
   );
 };
