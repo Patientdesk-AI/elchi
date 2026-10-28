@@ -910,7 +910,13 @@
     "transcribing": "Yazıya dökülüyor",
     "processing": "Düzenleniyor",
     "loadingModel": "Model yükleniyor",
-    "cancel": "İptal"
+    "cancel": "İptal",
+    "noField": {
+      "message": "Nereye yazacağımı bulamadım",
+      "copy": "Kopyala",
+      "copied": "Kopyalandı ✓",
+      "dismiss": "Kapat"
+    }
   },
   "whatsNew": {
     "title": "Elchi {{version}} sürümündeki yenilikler"

@@ -17,6 +17,20 @@ pub fn cancel_operation(app: AppHandle) {
     cancel_current_operation(&app);
 }
 
+/// The overlay's Copy button, for a dictation that had no text field to go into.
+#[tauri::command]
+#[specta::specta]
+pub fn copy_unplaced_dictation(app: AppHandle) -> Result<(), String> {
+    crate::clipboard::copy_unplaced(&app)
+}
+
+/// Closes the overlay's "Couldn't find where to type" card (its × or its timer).
+#[tauri::command]
+#[specta::specta]
+pub fn dismiss_no_field_overlay(app: AppHandle) {
+    crate::overlay::dismiss_no_field_overlay(&app);
+}
+
 #[tauri::command]
 #[specta::specta]
 pub fn is_portable() -> bool {

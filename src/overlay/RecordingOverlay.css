@@ -39,6 +39,8 @@
     inset 0 12px 20px -14px rgba(255, 255, 255, 0.35);
   --s-glass-drop:
     0 0 0 0.5px rgba(0, 0, 0, 0.55), 0 2px 4px rgba(0, 0, 0, 0.35);
+  --s-pop-drop:
+    0 0 0 0.5px rgba(0, 0, 0, 0.55), 0 10px 24px -12px rgba(0, 0, 0, 0.7);
 
   /* Card geometry — single source of truth for the visible overlay sizes. The
      native overlay window (overlay.rs) is sized to hold these plus a small
@@ -54,6 +56,12 @@
   /* idle line (overlay_idle_line): the pill shrunk between recordings */
   --ov-idle-w: 72px;
   --ov-idle-h: 4px;
+  /* "Couldn't find where to type" card, popping out of the pill. Its shadow
+     (--s-pop-drop) reaches 12px sideways and 22px down; the 400x140 window in
+     overlay.rs fits the widest, tallest card plus that (a test checks it). */
+  --ov-pop-max-w: 360px;
+  --ov-pop-max-h: 56px;
+  --ov-pop-gap: 8px;
   --ov-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -543,6 +551,129 @@
   }
 }
 
+/* ---- Nowhere to type: the pill holds the dictation, a card pops out of it
+   toward the screen's middle (above a bottom pill, below a top one). ---- */
+.sheld {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ov-pop-gap);
+}
+.ov-stage.top .sheld {
+  flex-direction: column-reverse;
+}
+.spop {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: var(--ov-pop-max-w);
+  min-height: var(--ov-pill-h);
+  max-height: var(--ov-pop-max-h);
+  padding: 6px 7px 6px 18px;
+  border-radius: 22px;
+  background: var(--s-glass-bg);
+  backdrop-filter: blur(26px) saturate(160%);
+  -webkit-backdrop-filter: blur(26px) saturate(160%);
+  border: 1px solid var(--s-glass-border);
+  box-shadow: var(--s-glass-inset), var(--s-pop-drop);
+  transform-origin: bottom center;
+  animation: spop-in 380ms var(--ov-ease);
+}
+.ov-stage.top .spop {
+  transform-origin: top center;
+  animation-name: spop-in-top;
+}
+@keyframes spop-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.9);
+  }
+}
+@keyframes spop-in-top {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.9);
+  }
+}
+.spop-msg {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.005em;
+  color: var(--s-text);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+/* Copy: the chrome CTA (recipes.css `.chrome-cta`, dark variant). */
+.scopy {
+  flex: none;
+  display: grid;
+  place-items: center;
+  height: 30px;
+  padding: 0 15px;
+  border: 0;
+  border-radius: 999px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: linear-gradient(180deg, #ffffff, #d9dfff);
+  color: #1b2bd6;
+  font-family: var(--s-font);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow:
+    inset 0 1px 0 #fff,
+    inset 0 -1px 0 rgba(27, 43, 214, 0.35),
+    0 6px 18px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  transition:
+    background 150ms ease,
+    transform 100ms ease;
+}
+.scopy > span {
+  grid-area: 1 / 1;
+}
+.scopy > .off {
+  visibility: hidden;
+}
+.scopy:hover {
+  background: linear-gradient(180deg, #ffffff, #cbd3ff);
+}
+.scopy:active {
+  transform: scale(0.97);
+}
+.scopy.done {
+  cursor: default;
+  transform: none;
+}
+.scopy:focus-visible {
+  outline: 2px solid var(--s-cell);
+  outline-offset: 2px;
+}
+/* The pill: a steady blue dot and the start of the held dictation. */
+.sdot.held {
+  background: radial-gradient(
+    circle at 35% 35%,
+    var(--s-accent-hi),
+    var(--s-accent)
+  );
+  box-shadow: 0 0 6px rgba(33, 64, 255, 0.6);
+}
+.sheld-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 13px;
+  line-height: 1.3;
+  color: var(--s-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* ---- Reduced motion: no pops, sweeps, scans or blinking ---- */
 @media (prefers-reduced-motion: reduce) {
   .scard,
@@ -557,7 +688,8 @@
   }
   .sdot.live,
   .swave.arming i,
-  .scaret {
+  .scaret,
+  .spop {
     animation: none;
   }
   .sprogress i {

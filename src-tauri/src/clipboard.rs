@@ -1,10 +1,13 @@
 use crate::input::{self, EnigoState};
+#[cfg(target_os = "macos")]
+use crate::settings::OverlayStyle;
 #[cfg(target_os = "linux")]
 use crate::settings::TypingTool;
 use crate::settings::{get_settings, AutoSubmitKey, ClipboardHandling, PasteMethod};
 use enigo::{Direction, Enigo, Key, Keyboard};
 use log::info;
 use std::process::Command;
+use std::sync::Mutex;
 #[cfg(target_os = "linux")]
 use std::sync::OnceLock;
 use std::time::Duration;
@@ -796,7 +799,36 @@ fn should_send_auto_submit(auto_submit: bool, paste_method: PasteMethod) -> bool
     auto_submit && paste_method != PasteMethod::None
 }
 
-pub fn paste(text: String, app_handle: AppHandle) -> Result<(), String> {
+/// What `paste` did with a dictation.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PasteOutcome {
+    Pasted,
+    /// Nothing that takes text had focus (macOS): the dictation is held for the
+    /// overlay's Copy button instead, see `copy_unplaced`.
+    #[cfg_attr(not(target_os = "macos"), allow(dead_code))]
+    NoField,
+}
+
+/// The last dictation that had nowhere to go.
+static UNPLACED: Mutex<Option<String>> = Mutex::new(None);
+
+/// Copies the last dictation that had nowhere to go, from the overlay's Copy button.
+/// A plain write: the user asked for the copy, so clipboard history apps keep it.
+pub fn copy_unplaced(app_handle: &AppHandle) -> Result<(), String> {
+    let text = UNPLACED
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .clone()
+        .ok_or("No dictation to copy")?;
+    app_handle
+        .clipboard()
+        .write_text(text)
+        .map_err(|e| format!("Failed to write to clipboard: {}", e))?;
+    info!("Copied the unplaced dictation to the clipboard");
+    Ok(())
+}
+
+pub fn paste(text: String, app_handle: AppHandle) -> Result<PasteOutcome, String> {
     let settings = get_settings(&app_handle);
     let paste_method = settings.paste_method;
     let paste_delay_ms = settings.paste_delay_ms;
@@ -813,6 +845,27 @@ pub fn paste(text: String, app_handle: AppHandle) -> Result<(), String> {
         "Using paste method: {:?}, delay before: {}ms, delay after: {}ms",
         paste_method, paste_delay_ms, paste_delay_after_ms
     );
+
+    // When Elchi is sure nothing that takes text has focus, hold the dictation for the
+    // overlay's Copy button instead of pasting into nothing, and skip auto-submit.
+    // Without the overlay there would be no button, so it pastes as before.
+    #[cfg(target_os = "macos")]
+    if matches!(
+        paste_method,
+        PasteMethod::Direct
+            | PasteMethod::CtrlV
+            | PasteMethod::CtrlShiftV
+            | PasteMethod::ShiftInsert
+    ) && settings.overlay_style != OverlayStyle::None
+        && crate::paste_target::check() == crate::paste_target::Target::NoField
+    {
+        info!("No text field has focus; holding the dictation for the overlay's Copy button");
+        *UNPLACED.lock().unwrap_or_else(|e| e.into_inner()) = Some(text.clone());
+        if settings.clipboard_handling == ClipboardHandling::CopyToClipboard {
+            write_text_to_clipboard(&app_handle, &text)?;
+        }
+        return Ok(PasteOutcome::NoField);
+    }
 
     // Perform the paste operation
     match paste_method {
@@ -847,7 +900,7 @@ pub fn paste(text: String, app_handle: AppHandle) -> Result<(), String> {
                     )
                 });
                 match reliable_result {
-                    Ok(()) => return Ok(()),
+                    Ok(()) => return Ok(PasteOutcome::Pasted),
                     Err(e) => {
                         log::warn!("Reliable paste unavailable ({e}); falling back to legacy paste")
                     }
@@ -885,7 +938,7 @@ pub fn paste(text: String, app_handle: AppHandle) -> Result<(), String> {
         write_text_to_clipboard(&app_handle, &text)?;
     }
 
-    Ok(())
+    Ok(PasteOutcome::Pasted)
 }
 
 #[cfg(test)]

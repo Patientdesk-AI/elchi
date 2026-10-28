@@ -19,8 +19,13 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Duration;
 
 use core_foundation::base::{CFType, CFTypeRef, TCFType};
-use core_foundation::string::{CFString, CFStringRef};
+use core_foundation::string::CFString;
 use tauri::AppHandle;
+
+use crate::ax::{
+    attribute, AXUIElementCreateApplication, AXUIElementCreateSystemWide, AXUIElementRef,
+    AXUIElementSetAttributeValue, AXValueGetValue, AXValueRef, CFRange, K_AX_VALUE_CF_RANGE_TYPE,
+};
 
 /// How often to look, and for how long: often at first (a chat message is fixed and
 /// sent within seconds), then now and then.
@@ -33,48 +38,11 @@ const MAX_FIELD_UTF16: usize = 200_000;
 
 static GENERATION: AtomicU64 = AtomicU64::new(0);
 
-type AXUIElementRef = *const c_void;
-type AXValueRef = *const c_void;
-
-#[repr(C)]
-#[derive(Default, Clone, Copy)]
-struct CFRange {
-    location: isize,
-    length: isize,
-}
-
-const K_AX_VALUE_CF_RANGE_TYPE: u32 = 4;
-
-#[link(name = "ApplicationServices", kind = "framework")]
-extern "C" {
-    fn AXUIElementCreateSystemWide() -> AXUIElementRef;
-    fn AXUIElementCreateApplication(pid: i32) -> AXUIElementRef;
-    fn AXUIElementSetAttributeValue(
-        element: AXUIElementRef,
-        attribute: CFStringRef,
-        value: CFTypeRef,
-    ) -> i32;
-    fn AXUIElementCopyAttributeValue(
-        element: AXUIElementRef,
-        attribute: CFStringRef,
-        value: *mut CFTypeRef,
-    ) -> i32;
-    fn AXValueGetValue(value: AXValueRef, the_type: u32, value_ptr: *mut c_void) -> bool;
-}
-
 /// The focused text field of whatever app is in front.
 struct Field(CFType);
 
 // AXUIElement is a CF object that may be used from any thread.
 unsafe impl Send for Field {}
-
-fn attribute(element: AXUIElementRef, name: &'static str) -> Option<CFType> {
-    let name = CFString::from_static_string(name);
-    let mut value: CFTypeRef = std::ptr::null();
-    let err =
-        unsafe { AXUIElementCopyAttributeValue(element, name.as_concrete_TypeRef(), &mut value) };
-    (err == 0 && !value.is_null()).then(|| unsafe { CFType::wrap_under_create_rule(value) })
-}
 
 impl Field {
     /// The focused element of the frontmost app (asking Electron and Chromium apps to

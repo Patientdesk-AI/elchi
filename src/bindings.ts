@@ -651,6 +651,23 @@ async showMainWindowCommand() : Promise<Result<null, string>> {
 async cancelOperation() : Promise<void> {
     await TAURI_INVOKE("cancel_operation");
 },
+/**
+ * The overlay's Copy button, for a dictation that had no text field to go into.
+ */
+async copyUnplacedDictation() : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("copy_unplaced_dictation") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+/**
+ * Closes the overlay's "Couldn't find where to type" card (its × or its timer).
+ */
+async dismissNoFieldOverlay() : Promise<void> {
+    await TAURI_INVOKE("dismiss_no_field_overlay");
+},
 async isPortable() : Promise<boolean> {
     return await TAURI_INVOKE("is_portable");
 },

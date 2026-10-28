@@ -913,7 +913,13 @@
     "transcribing": "Transcribing",
     "processing": "Polishing",
     "loadingModel": "Loading model",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "noField": {
+      "message": "Couldn't find where to type",
+      "copy": "Copy",
+      "copied": "Copied ✓",
+      "dismiss": "Dismiss"
+    }
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} may be blocking 1 shortcut",

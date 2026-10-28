@@ -775,7 +775,18 @@ impl ShortcutAction for TranscribeAction {
                                     }
 
                                     match utils::paste(final_text, ah_clone.clone()) {
-                                        Ok(()) => {
+                                        Ok(utils::PasteOutcome::NoField) => {
+                                            // Nowhere to type: the overlay offers a Copy
+                                            // button and dismisses itself.
+                                            hm_for_stats.record_dictation(
+                                                &pasted_text,
+                                                sample_count as f64 / 16_000.0,
+                                            );
+                                            utils::show_no_field_overlay(&ah_clone, &pasted_text);
+                                            set_tray_state(&ah_clone, TrayIconState::Idle);
+                                            return;
+                                        }
+                                        Ok(utils::PasteOutcome::Pasted) => {
                                             debug!(
                                                 "Text pasted successfully in {:?}",
                                                 paste_time.elapsed()
