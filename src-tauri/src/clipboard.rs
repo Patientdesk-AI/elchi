@@ -41,6 +41,31 @@ fn write_text_to_clipboard(app_handle: &AppHandle, text: &str) -> Result<(), Str
         .map_err(|e| format!("Failed to write to clipboard: {}", e))
 }
 
+/// Writes text that only sits on the clipboard for the duration of a paste
+/// (the transcript, or the restored previous text). On macOS it is tagged so
+/// clipboard history apps don't record it; elsewhere it is a plain write.
+fn write_transient_text_to_clipboard(app_handle: &AppHandle, text: &str) -> Result<(), String> {
+    #[cfg(target_os = "macos")]
+    match crate::concealed_pasteboard::write_text(text) {
+        Ok(()) => return Ok(()),
+        Err(e) => log::warn!("Concealed clipboard write failed ({e}); using a plain write"),
+    }
+
+    write_text_to_clipboard(app_handle, text)
+}
+
+/// Restores an image that was on the clipboard before a paste, tagged on macOS
+/// like `write_transient_text_to_clipboard` so history apps don't re-log it.
+fn restore_image_to_clipboard(app_handle: &AppHandle, image: &tauri::image::Image<'_>) {
+    #[cfg(target_os = "macos")]
+    match crate::concealed_pasteboard::write_image(image) {
+        Ok(()) => return,
+        Err(e) => log::warn!("Concealed image restore failed ({e}); using a plain write"),
+    }
+
+    let _ = app_handle.clipboard().write_image(image);
+}
+
 fn finish_clipboard_paste(
     paste_result: Result<(), String>,
     paste_delay_after_ms: u64,
@@ -71,7 +96,7 @@ fn paste_via_clipboard(
     };
 
     // Write text to clipboard first
-    write_text_to_clipboard(app_handle, text)?;
+    write_transient_text_to_clipboard(app_handle, text)?;
 
     std::thread::sleep(Duration::from_millis(paste_delay_ms));
 
@@ -106,10 +131,10 @@ fn paste_via_clipboard(
         // an image is only restored when the clipboard held no text at all, which is
         // the case that used to silently wipe screenshots.
         if let Some(clipboard_content) = saved_text {
-            let _ = write_text_to_clipboard(app_handle, &clipboard_content);
+            let _ = write_transient_text_to_clipboard(app_handle, &clipboard_content);
         } else if let Some(image) = saved_image {
             info!("Restoring image to clipboard");
-            let _ = clipboard.write_image(&image);
+            restore_image_to_clipboard(app_handle, &image);
         } else {
             // Nothing was there to begin with — don't leave the transcription behind.
             let _ = clipboard.clear();

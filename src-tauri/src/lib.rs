@@ -9,6 +9,8 @@ mod chinese_script;
 pub mod cli;
 mod clipboard;
 mod commands;
+#[cfg(target_os = "macos")]
+mod concealed_pasteboard;
 mod dictionary;
 pub mod duyu;
 mod elchi_pro;
