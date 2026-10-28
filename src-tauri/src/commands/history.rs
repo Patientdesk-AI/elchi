@@ -1,6 +1,6 @@
 use crate::actions::process_transcription_output;
 use crate::managers::{
-    history::{HistoryManager, PaginatedHistory},
+    history::{HistoryManager, HistorySearch, PaginatedHistory},
     transcription::TranscriptionManager,
 };
 use std::sync::Arc;
@@ -16,6 +16,22 @@ pub async fn get_history_entries(
 ) -> Result<PaginatedHistory, String> {
     history_manager
         .get_history_entries(cursor, limit)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Dictations matching `query`, newest first and paged like get_history_entries,
+/// for the home feed's search.
+#[tauri::command]
+#[specta::specta]
+pub async fn search_history_entries(
+    history_manager: State<'_, Arc<HistoryManager>>,
+    query: String,
+    cursor: Option<i64>,
+    limit: Option<usize>,
+) -> Result<HistorySearch, String> {
+    history_manager
+        .search_history_entries(&query, cursor, limit)
         .await
         .map_err(|e| e.to_string())
 }

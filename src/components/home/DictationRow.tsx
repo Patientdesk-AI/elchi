@@ -1,11 +1,24 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { commands, type HistoryEntry } from "@/bindings";
 import { AppTile } from "./AppTile";
 import { ChipButton, GhostButton, RowHead } from "./FeedRow";
 import { MiniPlayer } from "./MiniPlayer";
-import { countWords, pastedText, wordChanges, wordsOf } from "./text";
+import {
+  countWords,
+  fold,
+  matchRanges,
+  pastedText,
+  wordChanges,
+  wordsOf,
+} from "./text";
 
 /** The "more" glyph; a symbol, not text to translate. */
 const ELLIPSIS = "⋯";
@@ -93,6 +106,30 @@ const MoreMenu: React.FC<{
   );
 };
 
+/** Text with a search's matches marked. */
+const Marked: React.FC<{ text: string; ranges: [number, number][] }> = ({
+  text,
+  ranges,
+}) => {
+  if (!ranges.length) return <>{text}</>;
+  const out: React.ReactNode[] = [];
+  let at = 0;
+  ranges.forEach(([start, end], k) => {
+    if (start > at) out.push(text.slice(at, start));
+    out.push(
+      <mark
+        key={k}
+        className="rounded-[3px] bg-accent-soft/30 text-inherit [box-decoration-break:clone]"
+      >
+        {text.slice(start, end)}
+      </mark>,
+    );
+    at = end;
+  });
+  out.push(text.slice(at));
+  return <>{out}</>;
+};
+
 /** A sunken text box that grows with its text. */
 const GrowingText: React.FC<
   React.TextareaHTMLAttributes<HTMLTextAreaElement> & { value: string }
@@ -130,6 +167,8 @@ export const DictationRow: React.FC<{
   getAudioUrl: (fileName: string) => Promise<string | null>;
   onToggleSaved: (id: number) => void;
   onDelete: (id: number) => void;
+  /** A search's folded words, to mark in the text. */
+  highlight?: string[];
 }> = ({
   entry,
   when,
@@ -140,12 +179,14 @@ export const DictationRow: React.FC<{
   getAudioUrl,
   onToggleSaved,
   onDelete,
+  highlight,
 }) => {
   const { t, i18n } = useTranslation();
   const [draft, setDraft] = useState("");
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [showHeard, setShowHeard] = useState(false);
+  // Unset until toggled.
+  const [showHeard, setShowHeard] = useState<boolean | null>(null);
   const [word, setWord] = useState<string | null>(null);
   const [warm, setWarm] = useState(false);
   const [audible, setAudible] = useState(false);
@@ -164,6 +205,22 @@ export const DictationRow: React.FC<{
   const formatted =
     hasText && wordsOf(pasted) !== wordsOf(entry.transcription_text);
   const changes = entry.edited_from ? wordChanges(entry.edited_from, text) : [];
+  const marks = useMemo(
+    () => (highlight?.length ? matchRanges(text, highlight) : []),
+    [text, highlight],
+  );
+  const heardMarks = useMemo(
+    () =>
+      highlight?.length && formatted
+        ? matchRanges(entry.transcription_text, highlight)
+        : [],
+    [entry.transcription_text, highlight, formatted],
+  );
+  // Shown on its own when a searched word is only in what was heard.
+  const heardShown =
+    showHeard ??
+    (heardMarks.length > 0 &&
+      !!highlight?.some((w) => !fold(text).includes(w)));
   // Re-transcribing rewrites the text when it lands, so no edit, word, second
   // retry or delete may start meanwhile: the actions hide until it is done.
   const busy = editing || word !== null || retrying;
@@ -276,7 +333,7 @@ export const DictationRow: React.FC<{
           </p>
         ) : hasText ? (
           <p className="text-[16px] leading-[1.45] tracking-[-0.005em] whitespace-pre-wrap break-words select-text cursor-text [text-wrap:pretty]">
-            {text}
+            <Marked text={text} ranges={marks} />
           </p>
         ) : (
           <div className="flex flex-wrap items-center gap-3">
@@ -344,11 +401,11 @@ export const DictationRow: React.FC<{
                     {" · "}
                     <button
                       type="button"
-                      onClick={() => setShowHeard((v) => !v)}
-                      aria-expanded={showHeard}
+                      onClick={() => setShowHeard(!heardShown)}
+                      aria-expanded={heardShown}
                       className="uppercase hover:text-logo-primary cursor-pointer focus:outline-none focus-visible:text-logo-primary focus-visible:underline"
                     >
-                      {showHeard ? t("home.hideHeard") : t("home.showHeard")}
+                      {heardShown ? t("home.hideHeard") : t("home.showHeard")}
                     </button>
                   </>
                 )}
@@ -363,11 +420,11 @@ export const DictationRow: React.FC<{
           </div>
         )}
 
-        {formatted && showHeard && !editing && (
+        {formatted && heardShown && !editing && (
           <div className="border-s-2 border-[color:var(--hairline-strong)] ps-3 flex flex-col gap-1">
             <span className="label-mono">{t("home.heard")}</span>
             <p className="text-[13.5px] leading-[1.45] text-mid-gray whitespace-pre-wrap break-words select-text cursor-text">
-              {entry.transcription_text}
+              <Marked text={entry.transcription_text} ranges={heardMarks} />
             </p>
           </div>
         )}

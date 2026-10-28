@@ -1208,6 +1208,18 @@ async getHistoryEntries(cursor: number | null, limit: number | null) : Promise<R
     else return { status: "error", error: e  as any };
 }
 },
+/**
+ * Dictations matching `query`, newest first and paged like get_history_entries,
+ * for the home feed's search.
+ */
+async searchHistoryEntries(query: string, cursor: number | null, limit: number | null) : Promise<Result<HistorySearch, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("search_history_entries", { query, cursor, limit }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
 async toggleHistoryEntrySaved(id: number) : Promise<Result<null, string>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("toggle_history_entry_saved", { id }) };
@@ -1528,6 +1540,14 @@ app_name?: string | null;
  * What was pasted, when the user has since corrected it (the text is then the correction).
  */
 edited_from?: string | null }
+/**
+ * A page of the dictations matching a search, newest first.
+ */
+export type HistorySearch = { entries: HistoryEntry[]; has_more: boolean; 
+/**
+ * Every match older than the cursor, this page included.
+ */
+total: number }
 export type HistoryUpdatePayload = { action: "added"; entry: HistoryEntry } | { action: "updated"; entry: HistoryEntry } | { action: "deleted"; id: number } | { action: "toggled"; id: number }
 /**
  * Result of changing keyboard implementation

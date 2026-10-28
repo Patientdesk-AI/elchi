@@ -77,6 +77,15 @@ pub struct PaginatedHistory {
     pub has_more: bool,
 }
 
+/// A page of the dictations matching a search, newest first.
+#[derive(Clone, Debug, Serialize, Deserialize, Type)]
+pub struct HistorySearch {
+    pub entries: Vec<HistoryEntry>,
+    pub has_more: bool,
+    /// Every match older than the cursor, this page included.
+    pub total: u32,
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize, Type, tauri_specta::Event)]
 #[serde(tag = "action")]
 pub enum HistoryUpdatePayload {
@@ -107,6 +116,45 @@ pub struct HistoryEntry {
     /// What was pasted, when the user has since corrected it (the text is then the correction).
     #[serde(default)]
     pub edited_from: Option<String>,
+}
+
+/// Folds text for search: lower case, accents dropped, and dotted and dotless i
+/// alike, so "istanbul", "ilik" and "cagri" find "İstanbul", "ILIK" and "Çağrı".
+/// Mirrored by `fold` in src/components/home/text.ts, which highlights matches.
+fn fold_into(text: &str, out: &mut String) {
+    for c in text.chars().flat_map(char::to_lowercase) {
+        let base = match c {
+            // Combining marks: "İ" lowercases to "i" + U+0307, and decomposed text carries them.
+            '\u{300}'..='\u{36f}' => continue,
+            'à' | 'á' | 'â' | 'ã' | 'ä' | 'å' | 'ā' | 'ă' | 'ą' => 'a',
+            'ç' | 'ć' | 'ĉ' | 'ċ' | 'č' => 'c',
+            'ď' | 'đ' => 'd',
+            'è' | 'é' | 'ê' | 'ë' | 'ē' | 'ĕ' | 'ė' | 'ę' | 'ě' => 'e',
+            'ĝ' | 'ğ' | 'ġ' | 'ģ' => 'g',
+            'ĥ' | 'ħ' => 'h',
+            'ì' | 'í' | 'î' | 'ï' | 'ĩ' | 'ī' | 'ĭ' | 'į' | 'ı' => 'i',
+            'ĵ' => 'j',
+            'ķ' => 'k',
+            'ĺ' | 'ļ' | 'ľ' | 'ŀ' | 'ł' => 'l',
+            'ñ' | 'ń' | 'ņ' | 'ň' => 'n',
+            'ò' | 'ó' | 'ô' | 'õ' | 'ö' | 'ø' | 'ō' | 'ŏ' | 'ő' => 'o',
+            'ŕ' | 'ŗ' | 'ř' => 'r',
+            'ś' | 'ŝ' | 'ş' | 'š' | 'ș' => 's',
+            'ţ' | 'ť' | 'ŧ' | 'ț' => 't',
+            'ù' | 'ú' | 'û' | 'ü' | 'ũ' | 'ū' | 'ŭ' | 'ů' | 'ű' | 'ų' => 'u',
+            'ŵ' => 'w',
+            'ý' | 'ÿ' | 'ŷ' => 'y',
+            'ź' | 'ż' | 'ž' => 'z',
+            c => c,
+        };
+        out.push(base);
+    }
+}
+
+fn fold(text: &str) -> String {
+    let mut out = String::with_capacity(text.len());
+    fold_into(text, &mut out);
+    out
 }
 
 pub struct HistoryManager {
@@ -627,6 +675,75 @@ impl HistoryManager {
         Ok(PaginatedHistory { entries, has_more })
     }
 
+    /// Dictations holding every word of `query` (folded, see `fold_into`) in
+    /// their text as shown, the transcript as heard or the app's name; newest
+    /// first and paged like get_history_entries.
+    pub async fn search_history_entries(
+        &self,
+        query: &str,
+        cursor: Option<i64>,
+        limit: Option<usize>,
+    ) -> Result<HistorySearch> {
+        let conn = self.get_connection()?;
+        Self::search_with_conn(&conn, query, cursor, limit)
+    }
+
+    // A scan folded in Rust: SQLite's LIKE and lower() only fold ASCII. It
+    // reads every older row to count the matches: ~30 ms for 50k in a release build.
+    fn search_with_conn(
+        conn: &Connection,
+        query: &str,
+        cursor: Option<i64>,
+        limit: Option<usize>,
+    ) -> Result<HistorySearch> {
+        let terms: Vec<String> = query
+            .split_whitespace()
+            .map(fold)
+            .filter(|t| !t.is_empty())
+            .collect();
+        let limit = limit.map(|l| l.min(100));
+        let mut entries = Vec::new();
+        let mut total = 0u32;
+        if terms.is_empty() {
+            return Ok(HistorySearch {
+                entries,
+                has_more: false,
+                total,
+            });
+        }
+
+        let mut stmt = conn.prepare(
+            "SELECT id, file_name, timestamp, saved, title, transcription_text, post_processed_text, post_process_prompt, post_process_requested, app_name, edited_from
+             FROM transcription_history
+             WHERE id < ?1
+             ORDER BY id DESC",
+        )?;
+        let mut rows = stmt.query(params![cursor.unwrap_or(i64::MAX)])?;
+        let mut haystack = String::new();
+        while let Some(row) = rows.next()? {
+            haystack.clear();
+            // The shown text is the post-processed one (an edit is saved there) or the transcript.
+            for column in ["post_processed_text", "transcription_text", "app_name"] {
+                if let rusqlite::types::ValueRef::Text(t) = row.get_ref(column)? {
+                    fold_into(&String::from_utf8_lossy(t), &mut haystack);
+                    haystack.push('\n');
+                }
+            }
+            if terms.iter().all(|t| haystack.contains(t.as_str())) {
+                total += 1;
+                if limit.is_none_or(|lim| entries.len() < lim) {
+                    entries.push(Self::map_history_entry(row)?);
+                }
+            }
+        }
+
+        Ok(HistorySearch {
+            has_more: total as usize > entries.len(),
+            entries,
+            total,
+        })
+    }
+
     #[cfg(test)]
     fn get_latest_entry_with_conn(conn: &Connection) -> Result<Option<HistoryEntry>> {
         let mut stmt = conn.prepare(
@@ -858,5 +975,136 @@ mod tests {
 
         assert_eq!(entry.timestamp, 100);
         assert_eq!(entry.transcription_text, "completed");
+    }
+
+    /// The real schema, migrations and all.
+    fn migrated_conn() -> Connection {
+        let mut conn = Connection::open_in_memory().expect("open in-memory db");
+        Migrations::new(MIGRATIONS.to_vec())
+            .to_latest(&mut conn)
+            .expect("migrate");
+        conn
+    }
+
+    fn insert_dictation(conn: &Connection, text: &str, processed: Option<&str>, app: Option<&str>) {
+        conn.execute(
+            "INSERT INTO transcription_history (file_name, timestamp, title, transcription_text, post_processed_text, app_name)
+             VALUES ('a.wav', 0, '', ?1, ?2, ?3)",
+            params![text, processed, app],
+        )
+        .expect("insert dictation");
+    }
+
+    fn search_ids(conn: &Connection, query: &str) -> Vec<i64> {
+        HistoryManager::search_with_conn(conn, query, None, Some(40))
+            .expect("search")
+            .entries
+            .iter()
+            .map(|e| e.id)
+            .collect()
+    }
+
+    #[test]
+    fn fold_handles_turkish_case_and_accents() {
+        assert_eq!(fold("İstanbul"), "istanbul");
+        assert_eq!(fold("ILIK"), "ilik");
+        assert_eq!(fold("ılık"), "ilik");
+        assert_eq!(fold("Çağrı"), "cagri");
+        assert_eq!(fold("çağrı"), "cagri");
+        assert_eq!(fold("ŞÖYLE ÜZGÜN"), "soyle uzgun");
+        // Decomposed "c" + cedilla, as some apps paste it.
+        assert_eq!(fold("c\u{327}ay"), "cay");
+        assert_eq!(fold("Crème Brûlée"), "creme brulee");
+    }
+
+    #[test]
+    fn search_matches_shown_text_transcript_and_app() {
+        let conn = migrated_conn();
+        insert_dictation(&conn, "istanbul'a gidiyorum", None, Some("Mail")); // 1
+        insert_dictation(&conn, "raw words", Some("ILIK bir gün"), Some("Slack")); // 2
+        insert_dictation(&conn, "Çağrı'yı ara", None, None); // 3
+        insert_dictation(&conn, "nothing here", None, Some("Notes")); // 4
+
+        assert_eq!(search_ids(&conn, "İSTANBUL"), vec![1]);
+        assert_eq!(search_ids(&conn, "ılık"), vec![2]);
+        assert_eq!(search_ids(&conn, "raw"), vec![2]);
+        assert_eq!(search_ids(&conn, "çağrı"), vec![3]);
+        assert_eq!(search_ids(&conn, "cagri"), vec![3]);
+        assert_eq!(search_ids(&conn, "slack"), vec![2]);
+        // Every word must match, in any field; newest first.
+        assert_eq!(search_ids(&conn, "notes nothing"), vec![4]);
+        assert_eq!(search_ids(&conn, "notes ılık"), Vec::<i64>::new());
+        assert_eq!(search_ids(&conn, "i"), vec![4, 3, 2, 1]);
+        assert_eq!(search_ids(&conn, "   "), Vec::<i64>::new());
+    }
+
+    #[test]
+    fn search_takes_percent_and_underscore_literally() {
+        let conn = migrated_conn();
+        insert_dictation(&conn, "yüzde 50% indirim", None, None); // 1
+        insert_dictation(&conn, "file_name here", None, None); // 2
+        insert_dictation(&conn, "filexname 50 percent", None, None); // 3
+
+        assert_eq!(search_ids(&conn, "50%"), vec![1]);
+        assert_eq!(search_ids(&conn, "%"), vec![1]);
+        assert_eq!(search_ids(&conn, "file_name"), vec![2]);
+        assert_eq!(search_ids(&conn, "_"), vec![2]);
+    }
+
+    #[test]
+    fn search_pages_from_the_cursor() {
+        let conn = migrated_conn();
+        for i in 0..5 {
+            insert_dictation(&conn, &format!("not {i}"), None, None);
+            insert_dictation(&conn, &format!("toplantı {i}"), None, None);
+        }
+        let first = HistoryManager::search_with_conn(&conn, "TOPLANTI", None, Some(2)).unwrap();
+        assert_eq!(
+            first.entries.iter().map(|e| e.id).collect::<Vec<_>>(),
+            vec![10, 8]
+        );
+        assert!(first.has_more);
+        assert_eq!(first.total, 5);
+        let next = HistoryManager::search_with_conn(&conn, "toplanti", Some(8), Some(2)).unwrap();
+        assert_eq!(
+            next.entries.iter().map(|e| e.id).collect::<Vec<_>>(),
+            vec![6, 4]
+        );
+        assert!(next.has_more);
+        assert_eq!(next.total, 3);
+        let last = HistoryManager::search_with_conn(&conn, "toplanti", Some(4), Some(2)).unwrap();
+        assert_eq!(
+            last.entries.iter().map(|e| e.id).collect::<Vec<_>>(),
+            vec![2]
+        );
+        assert!(!last.has_more);
+    }
+
+    #[test]
+    fn search_scans_50k_dictations_quickly() {
+        let mut conn = migrated_conn();
+        let tx = conn.transaction().unwrap();
+        for i in 0..50_000 {
+            insert_dictation(
+                &tx,
+                &format!("Bugün İstanbul'da hava çok güzel, toplantı saat {i}'de başlıyor ve herkes gelecek."),
+                Some(&format!("Bugün İstanbul'da hava çok güzel. Toplantı saat {i}'de başlıyor, herkes gelecek.")),
+                Some("Slack"),
+            );
+        }
+        tx.commit().unwrap();
+
+        let start = std::time::Instant::now();
+        let r = HistoryManager::search_with_conn(&conn, "Ankara", None, Some(40)).unwrap();
+        let none = start.elapsed();
+        let start = std::time::Instant::now();
+        let all = HistoryManager::search_with_conn(&conn, "istanbul", None, Some(40)).unwrap();
+        let every = start.elapsed();
+        println!("50k rows: no match {none:?}, all match {every:?}");
+        assert_eq!(r.total, 0);
+        assert_eq!(all.total, 50_000);
+        assert_eq!(all.entries.len(), 40);
+        // Generous, for unoptimized test builds on slow CI machines.
+        assert!(none.as_millis() < 3000 && every.as_millis() < 3000);
     }
 }
