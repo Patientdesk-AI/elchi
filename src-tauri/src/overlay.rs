@@ -53,12 +53,19 @@ const OVERLAY_HEIGHT: f64 = 50.0;
 const OVERLAY_STREAM_WIDTH: f64 = 400.0;
 const OVERLAY_STREAM_HEIGHT: f64 = 120.0;
 
+// "Couldn't find where to type" (macOS): the compact pill with a card popping out of
+// it toward the screen's middle. The card is at most --ov-pop-max-w wide and two lines
+// tall, and its drop shadow reaches 12px to each side and 22px down; macOS clips what
+// is drawn past the transparent window's edge, so the window leaves room for both.
+const OVERLAY_NO_FIELD_WIDTH: f64 = 400.0;
+const OVERLAY_NO_FIELD_HEIGHT: f64 = 140.0;
+
 /// Overlay window size (logical) for a given UI state.
 fn overlay_dimensions(state: &str) -> (f64, f64) {
-    if state == "streaming" {
-        (OVERLAY_STREAM_WIDTH, OVERLAY_STREAM_HEIGHT)
-    } else {
-        (OVERLAY_WIDTH, OVERLAY_HEIGHT)
+    match state {
+        "streaming" => (OVERLAY_STREAM_WIDTH, OVERLAY_STREAM_HEIGHT),
+        "nofield" => (OVERLAY_NO_FIELD_WIDTH, OVERLAY_NO_FIELD_HEIGHT),
+        _ => (OVERLAY_WIDTH, OVERLAY_HEIGHT),
     }
 }
 
@@ -562,7 +569,10 @@ fn show_overlay_state_on_main(app_handle: &AppHandle, state: &str) {
     if let Some(overlay_window) = app_handle.get_webview_window("recording_overlay") {
         // Invalidate any delayed hide still in flight from a previous session
         // (see `hide_recording_overlay`).
-        OVERLAY_SHOW_GENERATION.fetch_add(1, Ordering::SeqCst);
+        let generation = OVERLAY_SHOW_GENERATION.fetch_add(1, Ordering::SeqCst) + 1;
+        if state == "nofield" {
+            NO_FIELD_GENERATION.store(generation, Ordering::SeqCst);
+        }
 
         #[cfg(target_os = "linux")]
         let shown_with_layer_shell = if LAYER_SHELL_ACTIVE.load(Ordering::SeqCst) {
@@ -688,6 +698,28 @@ pub fn show_idle_overlay(app_handle: &AppHandle) {
     show_overlay_state(app_handle, "idle");
 }
 
+/// Shows the pill with a "Couldn't find where to type" card and a Copy button, for a
+/// dictation that had no text field to go into (see `clipboard::paste`); the pill
+/// shows the start of `text`. The overlay dismisses it itself after a few seconds.
+pub fn show_no_field_overlay(app_handle: &AppHandle, text: &str) {
+    let _ = app_handle.emit_to("recording_overlay", "no-field-text", text);
+    show_overlay_state(app_handle, "nofield");
+}
+
+/// Dismisses the "Couldn't find where to type" card, unless the overlay has shown
+/// anything else since (a new recording must not be taken down by the old card's
+/// timer).
+pub fn dismiss_no_field_overlay(app_handle: &AppHandle) {
+    let handle = app_handle.clone();
+    let _ = app_handle.run_on_main_thread(move || {
+        if OVERLAY_SHOW_GENERATION.load(Ordering::SeqCst)
+            == NO_FIELD_GENERATION.load(Ordering::SeqCst)
+        {
+            hide_recording_overlay(&handle);
+        }
+    });
+}
+
 /// Updates the overlay window position based on current settings
 pub fn update_overlay_position(app_handle: &AppHandle) {
     // Positioning queries monitors/cursor (GDK/Xlib on Linux) and moves the
@@ -742,6 +774,10 @@ fn update_overlay_position_on_main(app_handle: &AppHandle) {
 /// press the coordinator remembered while the pipeline was busy and started
 /// the instant it drained, well inside the 300 ms hide delay.
 static OVERLAY_SHOW_GENERATION: AtomicU64 = AtomicU64::new(0);
+
+/// The show generation of the last "Couldn't find where to type" card, so dismissing
+/// it is a no-op once anything else has been shown.
+static NO_FIELD_GENERATION: AtomicU64 = AtomicU64::new(0);
 
 /// Hides the recording overlay after a session. With the idle line on, the
 /// window stays up and shrinks to the line instead, so the next recording
@@ -848,6 +884,31 @@ mod tests {
         assert!(is_mouse_within_monitor((-1, 1239), &position, &size));
         assert!(!is_mouse_within_monitor((0, 0), &position, &size));
         assert!(!is_mouse_within_monitor((-1, 1240), &position, &size));
+    }
+
+    /// A `--name: 12px` custom property from RecordingOverlay.css.
+    fn css_var(css: &str, name: &str) -> f64 {
+        let start = css.find(&format!("{name}:")).expect(name) + name.len() + 1;
+        let value = css[start..].split(';').next().unwrap().trim();
+        value.trim_end_matches("px").parse().expect(name)
+    }
+
+    #[test]
+    fn no_field_window_fits_the_card_and_its_shadow() {
+        let css = include_str!("../../src/overlay/RecordingOverlay.css");
+        assert!(css.contains("0 10px 24px -12px"), "--s-pop-drop changed");
+        let (shadow_side, shadow_down) = (24.0 - 12.0, 10.0 + 24.0 - 12.0);
+        let stage_padding = 3.0;
+        let (width, height) = overlay_dimensions("nofield");
+        assert!(width >= css_var(css, "--ov-pop-max-w") + 2.0 * shadow_side);
+        assert!(
+            height
+                >= stage_padding
+                    + css_var(css, "--ov-pill-h")
+                    + css_var(css, "--ov-pop-gap")
+                    + css_var(css, "--ov-pop-max-h")
+                    + shadow_down
+        );
     }
 
     #[cfg(target_os = "windows")]

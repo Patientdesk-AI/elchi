@@ -4,11 +4,15 @@ mod apple_intelligence;
 mod audio_feedback;
 pub mod audio_toolkit;
 mod autostart;
+#[cfg(target_os = "macos")]
+mod ax;
 mod catalog;
 mod chinese_script;
 pub mod cli;
 mod clipboard;
 mod commands;
+#[cfg(target_os = "macos")]
+mod concealed_pasteboard;
 mod dictionary;
 pub mod duyu;
 mod elchi_pro;
@@ -21,6 +25,8 @@ mod managers;
 mod meeting;
 mod memory;
 mod overlay;
+#[cfg(target_os = "macos")]
+mod paste_target;
 mod paste_tx;
 pub mod portable;
 mod secure_input;
@@ -851,6 +857,8 @@ pub fn run(cli_args: CliArgs) {
             release_hidden_main_window,
             show_main_window_command,
             commands::cancel_operation,
+            commands::copy_unplaced_dictation,
+            commands::dismiss_no_field_overlay,
             commands::is_portable,
             commands::is_update_checks_locked,
             commands::get_app_dir_path,
@@ -918,6 +926,7 @@ pub fn run(cli_args: CliArgs) {
             commands::transcription::get_model_load_status,
             commands::transcription::unload_model_manually,
             commands::history::get_history_entries,
+            commands::history::search_history_entries,
             commands::history::toggle_history_entry_saved,
             commands::history::get_audio_file_path,
             commands::history::delete_history_entry,

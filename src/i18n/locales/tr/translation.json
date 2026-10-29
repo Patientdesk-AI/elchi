@@ -330,6 +330,7 @@
         "none": "Kısayol ayarlanmadı",
         "notFound": "Kısayol bulunamadı",
         "pressKeys": "Tuşlara basın...",
+        "change": "Kısayolu değiştir",
         "bindings": {
           "transcribe": {
             "name": "Dikte kısayolu",
@@ -909,7 +910,13 @@
     "transcribing": "Yazıya dökülüyor",
     "processing": "Düzenleniyor",
     "loadingModel": "Model yükleniyor",
-    "cancel": "İptal"
+    "cancel": "İptal",
+    "noField": {
+      "message": "Nereye yazacağımı bulamadım",
+      "copy": "Kopyala",
+      "copied": "Kopyalandı ✓",
+      "dismiss": "Kapat"
+    }
   },
   "whatsNew": {
     "title": "Elchi {{version}} sürümündeki yenilikler"
@@ -988,6 +995,16 @@
     "moreFailed": "Eski kayıtlar yüklenemedi. Yeniden dene",
     "loading": "Yükleniyor…",
     "openFolder": "Kayıt klasörünü aç",
+    "search": {
+      "open": "Ara",
+      "close": "Aramayı kapat",
+      "placeholder": "Dikte ara…",
+      "count_one": "{{n}} sonuç",
+      "count_other": "{{n}} sonuç",
+      "empty": "Sonuç yok",
+      "emptyBody": "“{{query}}” geçen bir dikte yok.",
+      "failed": "Diktelerde arama yapılamadı."
+    },
     "bar": {
       "hoursMinutes": "{{h}} sa {{m}} dk",
       "minutes": "{{m}} dk",

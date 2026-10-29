@@ -19,7 +19,8 @@ type OverlayState =
   | "recording"
   | "streaming"
   | "transcribing"
-  | "processing";
+  | "processing"
+  | "nofield";
 
 // Number of bar cells in the waveform (shared by every overlay form). Mic
 // levels arrive as 16 FFT buckets, resampled across the bars.
@@ -55,6 +56,11 @@ const cancelKeyLabel = (binding: string): string =>
 // Windows CPU backend), so the common case never flashes a loading notice while
 // the user is speaking; cold loads can take 40s+.
 const SLOW_MODEL_LOAD_MS = 2000;
+
+// "Couldn't find where to type": how long the card stays up, and how long the
+// "Copied" confirmation shows before it goes.
+const NO_FIELD_MS = 6000;
+const COPIED_MS = 1200;
 
 const RecordingOverlay: React.FC = () => {
   const { t } = useTranslation();
@@ -95,6 +101,11 @@ const RecordingOverlay: React.FC = () => {
 
   // The user's cancel shortcut, shown as the keycap on the Live panel.
   const [cancelKey, setCancelKey] = useState("escape");
+
+  // A dictation that had no text field to go into: the pill shows its start and
+  // the card above it offers to copy it.
+  const [unplacedText, setUnplacedText] = useState("");
+  const [copied, setCopied] = useState(false);
 
   const smoothedLevelsRef = useRef<number[]>(Array(MIC_BUCKETS).fill(0));
   // Live-text scroll-back: the text region "sticks" to the newest line while the
@@ -139,6 +150,7 @@ const RecordingOverlay: React.FC = () => {
           // Keep the previous/default placement if settings can't be read.
         }
         setState(overlayState);
+        setCopied(false);
         if (overlayState === "streaming") {
           setPhase("listening");
           setWorkKind("transcribing");
@@ -152,6 +164,10 @@ const RecordingOverlay: React.FC = () => {
       const unlistenHide = await listen("hide-overlay", () => {
         setIsVisible(false);
         setCaptureReady(false);
+      });
+
+      const unlistenNoField = await listen<string>("no-field-text", (event) => {
+        setUnplacedText(event.payload);
       });
 
       const unlistenReady = await listen("recording-ready", () => {
@@ -211,6 +227,7 @@ const RecordingOverlay: React.FC = () => {
       return () => {
         unlistenShow();
         unlistenHide();
+        unlistenNoField();
         unlistenReady();
         unlistenLevel();
         unlistenStream();
@@ -246,6 +263,18 @@ const RecordingOverlay: React.FC = () => {
   useEffect(() => {
     if (modelLoadSlow && state === "streaming") setLoadNoticeShown(true);
   }, [modelLoadSlow, state, session]);
+
+  // The "Couldn't find where to type" card goes by itself: after a few seconds,
+  // or shortly after Copy. The backend ignores this if anything else has been
+  // shown since.
+  useEffect(() => {
+    if (state !== "nofield" || !isVisible) return;
+    const id = setTimeout(
+      () => commands.dismissNoFieldOverlay(),
+      copied ? COPIED_MS : NO_FIELD_MS,
+    );
+    return () => clearTimeout(id);
+  }, [state, isVisible, copied]);
 
   // Each fresh streaming session starts pinned to the bottom, fade cleared.
   useEffect(() => {
@@ -299,6 +328,17 @@ const RecordingOverlay: React.FC = () => {
     </span>
   );
 
+  const xIcon = (
+    <svg viewBox="0 0 16 16" aria-hidden="true">
+      <path
+        d="M5 5 L11 11 M11 5 L5 11"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+
   const cancelBtn = (
     <button
       type="button"
@@ -306,14 +346,7 @@ const RecordingOverlay: React.FC = () => {
       aria-label={t("overlay.cancel")}
       onClick={() => commands.cancelOperation()}
     >
-      <svg viewBox="0 0 16 16" aria-hidden="true">
-        <path
-          d="M5 5 L11 11 M11 5 L5 11"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
-      </svg>
+      {xIcon}
     </button>
   );
 
@@ -438,6 +471,58 @@ const RecordingOverlay: React.FC = () => {
                 end,
               )
             : listeningRow(end)}
+        </div>
+      </div>
+    );
+  }
+
+  // ---- Nowhere to type: the pill holds the dictation and a card pops out of
+  // it, toward the screen's middle, offering to copy it. Never takes focus; the
+  // card dismisses itself.
+  if (state === "nofield") {
+    const copy = async () => {
+      const result = await commands.copyUnplacedDictation();
+      if (result.status === "ok") setCopied(true);
+    };
+    return (
+      <div
+        dir={direction}
+        lang={lang}
+        className={`ov-stage ${position} ov-fade show`}
+      >
+        <div className="sheld">
+          <section className="spop" role="alert">
+            <p className="spop-msg">{t("overlay.noField.message")}</p>
+            <button
+              type="button"
+              className={`scopy ${copied ? "done" : ""}`}
+              onClick={copy}
+              disabled={copied}
+            >
+              {/* Both labels share one grid cell, so the button is as wide as
+                  the longer and the card doesn't jump when it says Copied. */}
+              <span className={copied ? "off" : ""}>
+                {t("overlay.noField.copy")}
+              </span>
+              <span className={copied ? "" : "off"} aria-live="polite">
+                {t("overlay.noField.copied")}
+              </span>
+            </button>
+          </section>
+          <div className="scard compact">
+            <div className="sbase">
+              <span className="sdot held" />
+              <span className="sheld-text">{unplacedText}</span>
+              <button
+                type="button"
+                className="sx"
+                aria-label={t("overlay.noField.dismiss")}
+                onClick={() => commands.dismissNoFieldOverlay()}
+              >
+                {xIcon}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );

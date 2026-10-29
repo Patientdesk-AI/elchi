@@ -286,6 +286,7 @@
         "none": "No shortcuts configured",
         "notFound": "Shortcut not found",
         "pressKeys": "Press keys...",
+        "change": "Change shortcut",
         "bindings": {
           "transcribe": {
             "name": "Transcribe Shortcut",
@@ -912,7 +913,13 @@
     "transcribing": "Transcribing",
     "processing": "Polishing",
     "loadingModel": "Loading model",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "noField": {
+      "message": "Couldn't find where to type",
+      "copy": "Copy",
+      "copied": "Copied ✓",
+      "dismiss": "Dismiss"
+    }
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} may be blocking 1 shortcut",
@@ -988,6 +995,16 @@
     "moreFailed": "Couldn't load older dictations. Try again",
     "loading": "Loading…",
     "openFolder": "Open recordings folder",
+    "search": {
+      "open": "Search",
+      "close": "Close search",
+      "placeholder": "Search dictations…",
+      "count_one": "{{n}} result",
+      "count_other": "{{n}} results",
+      "empty": "No results",
+      "emptyBody": "No dictation contains “{{query}}”.",
+      "failed": "Couldn't search your dictations."
+    },
     "bar": {
       "hoursMinutes": "{{h}} h {{m}} min",
       "minutes": "{{m}} min",

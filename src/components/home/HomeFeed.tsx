@@ -1,6 +1,7 @@
 import React, {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -24,10 +25,12 @@ import { formatKeyCombination } from "@/lib/utils/keyboard";
 import type { SidebarSection } from "../Sidebar";
 import { DictationRow } from "./DictationRow";
 import { ChipButton, ElchiPost, GhostButton } from "./FeedRow";
+import { SearchButton, SearchField } from "./FeedSearch";
 import { TopBar } from "./TopBar";
 import { UpsellCard } from "./UpsellCard";
 import { EmptyHero, WeekHero } from "./WeekHero";
-import { dayKey, pastedText } from "./text";
+import { appendFound, applyToFound, type Found } from "./searchResults";
+import { dayKey, pastedText, searchTerms } from "./text";
 import { useIsDark } from "./useIsDark";
 
 /** Dictations fetched per page; scrolling to the end fetches the next. */
@@ -50,10 +53,16 @@ type Item =
   | { kind: "streak"; at: number; days: number }
   | { kind: "milestone"; at: number; words: number };
 
-const DayHeader: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <h2 className="pt-[26px] pb-2.5 font-mono text-[10px] tracking-[0.12em] uppercase font-normal text-text/40">
-    {children}
-  </h2>
+const DayHeader: React.FC<{
+  children: React.ReactNode;
+  aside?: React.ReactNode;
+}> = ({ children, aside }) => (
+  <div className="flex items-center gap-3 pt-[26px] pb-2.5">
+    <h2 className="flex-1 min-w-0 font-mono text-[10px] tracking-[0.12em] uppercase font-normal text-text/40">
+      {children}
+    </h2>
+    {aside}
+  </div>
 );
 
 /**
@@ -87,11 +96,36 @@ export const HomeFeed: React.FC<{
   const [dismissedTrial, setDismissedTrial] = useState(readDismissed);
   const entriesRef = useRef<HistoryEntry[] | null>(null);
   const loadingMoreRef = useRef(false);
-  const sentinelRef = useRef<HTMLDivElement>(null);
+  // The "load older" rows, kept in state: each remounts as a new element
+  // (searching swaps one for the other), and its scroll observer must follow.
+  const [sentinel, setSentinel] = useState<HTMLDivElement | null>(null);
+  const [foundSentinel, setFoundSentinel] = useState<HTMLDivElement | null>(
+    null,
+  );
+  // Search: the query while the field is open (null when closed), and the
+  // results the backend found for it.
+  const [query, setQuery] = useState<string | null>(null);
+  const [found, setFound] = useState<Found | null>(null);
+  const [foundLoading, setFoundLoading] = useState(false);
+  const [foundFailed, setFoundFailed] = useState(false);
+  const foundRef = useRef<Found | null>(null);
+  const foundLoadingRef = useRef(false);
+  // Bumped on every new query, so answers to older ones are dropped.
+  const searchSeq = useRef(0);
+  // The folded words being searched for now, for callbacks that outlive a query.
+  const termsRef = useRef("");
+  const mainRef = useRef<HTMLElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
+  // Where the feed was scrolled when the search opened, restored on close.
+  const feedScroll = useRef<number | null>(null);
 
   useEffect(() => {
     entriesRef.current = entries;
   }, [entries]);
+
+  useEffect(() => {
+    foundRef.current = found;
+  }, [found]);
 
   const refreshStats = useCallback(() => {
     commands.getDictationStats().then((r) => {
@@ -148,6 +182,7 @@ export const HomeFeed: React.FC<{
   useEffect(() => {
     refresh();
     const unHistory = events.historyUpdatePayload.listen(({ payload }) => {
+      setFound((prev) => applyToFound(prev, payload));
       if (payload.action === "added")
         setEntries((prev) =>
           prev?.some((e) => e.id === payload.entry.id)
@@ -185,20 +220,120 @@ export const HomeFeed: React.FC<{
 
   // Older pages load when the end of the feed scrolls into view.
   useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el || !hasMore || moreFailed) return;
+    if (!sentinel || !hasMore || moreFailed) return;
     const io = new IntersectionObserver((seen) => {
       if (seen[0]?.isIntersecting) loadMore();
     });
-    io.observe(el);
+    io.observe(sentinel);
     return () => io.disconnect();
-  }, [hasMore, moreFailed, loadMore]);
+  }, [sentinel, hasMore, moreFailed, loadMore]);
+
+  const terms = useMemo(() => searchTerms(query ?? ""), [query]);
+  const termsKey = terms.join(" ");
+  const searching = termsKey !== "";
+
+  // The backend searches the whole history, a moment after typing stops.
+  useEffect(() => {
+    const seq = ++searchSeq.current;
+    termsRef.current = termsKey;
+    setFoundFailed(false);
+    if (!termsKey) {
+      setFound(null);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      const r = await commands
+        .searchHistoryEntries(termsKey, null, PAGE)
+        .catch(() => ({ status: "error" as const }));
+      if (seq !== searchSeq.current) return;
+      if (r.status !== "ok") {
+        toast.error(t("home.search.failed"));
+        return;
+      }
+      setFound({
+        q: termsKey,
+        entries: r.data.entries,
+        hasMore: r.data.has_more,
+        total: r.data.total,
+      });
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [termsKey, t]);
+
+  const loadMoreFound = useCallback(async () => {
+    const cur = foundRef.current;
+    const last = cur?.entries[cur.entries.length - 1];
+    // The results shown may still be for the previous query while the new
+    // one loads; paging them would mix the two.
+    if (!cur || !last || foundLoadingRef.current) return;
+    if (cur.q !== termsRef.current) return;
+    foundLoadingRef.current = true;
+    setFoundLoading(true);
+    const r = await commands
+      .searchHistoryEntries(cur.q, last.id, PAGE)
+      .catch(() => ({ status: "error" as const }));
+    foundLoadingRef.current = false;
+    setFoundLoading(false);
+    if (cur.q !== termsRef.current) return;
+    if (r.status !== "ok") {
+      setFoundFailed(true);
+      return;
+    }
+    setFoundFailed(false);
+    setFound((prev) => appendFound(prev, cur.q, r.data));
+  }, []);
+
+  useEffect(() => {
+    if (!foundSentinel || !found?.hasMore || foundFailed) return;
+    const io = new IntersectionObserver((seen) => {
+      if (seen[0]?.isIntersecting) loadMoreFound();
+    });
+    io.observe(foundSentinel);
+    return () => io.disconnect();
+  }, [foundSentinel, found?.hasMore, foundFailed, loadMoreFound]);
+
+  const openSearch = useCallback(() => {
+    setQuery((q) => {
+      if (q === null) feedScroll.current = mainRef.current?.scrollTop ?? 0;
+      return q ?? "";
+    });
+    searchRef.current?.focus();
+    searchRef.current?.select();
+  }, []);
+
+  const closeSearch = useCallback(() => setQuery(null), []);
+
+  // Opening scrolls the field into view; closing returns the feed to where it was.
+  const open = query !== null;
+  useLayoutEffect(() => {
+    if (open) {
+      searchRef.current?.scrollIntoView({ block: "nearest" });
+    } else if (feedScroll.current !== null) {
+      if (mainRef.current) mainRef.current.scrollTop = feedScroll.current;
+      feedScroll.current = null;
+    }
+  }, [open]);
+
+  // Cmd+F (Ctrl+F off macOS) opens the search, as in a browser.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const mod = osType === "macos" ? e.metaKey : e.ctrlKey;
+      if (mod && !e.altKey && !e.shiftKey && e.key.toLowerCase() === "f") {
+        e.preventDefault();
+        openSearch();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [osType, openSearch]);
 
   // The apps' own icons (macOS), fetched once per app name.
   useEffect(() => {
     const names = [
       ...new Set(
-        (entries ?? []).map((e) => e.app_name).filter((a): a is string => !!a),
+        [...(entries ?? []), ...(found?.entries ?? [])]
+          .map((e) => e.app_name)
+          .filter((a): a is string => !!a),
       ),
     ].filter((a) => !(a in icons));
     if (!names.length) return;
@@ -216,7 +351,7 @@ export const HomeFeed: React.FC<{
         ...Object.fromEntries(names.map((nm) => [nm, urls[nm] ?? ""])),
       }));
     });
-  }, [entries, icons]);
+  }, [entries, found, icons]);
 
   const getAudioUrl = useCallback(
     async (fileName: string) => {
@@ -244,6 +379,7 @@ export const HomeFeed: React.FC<{
   const deleteEntry = useCallback(
     async (id: number) => {
       setEntries((prev) => (prev ?? []).filter((e) => e.id !== id));
+      setFound((prev) => applyToFound(prev, { action: "deleted", id }));
       const r = await commands.deleteHistoryEntry(id);
       if (r.status === "error") {
         toast.error(t("home.row.deleteFailed"));
@@ -298,15 +434,26 @@ export const HomeFeed: React.FC<{
     return out.sort((a, b) => b.at - a.at);
   }, [entries, dictionary, stats, now]);
 
+  // The search's results, as dictation items: Elchi's posts stay out of them.
+  const foundItems = useMemo<Item[]>(
+    () =>
+      (found?.entries ?? []).map((e) => ({
+        kind: "dictation",
+        at: e.timestamp * 1000,
+        entry: e,
+      })),
+    [found],
+  );
+
   const groups = useMemo(() => {
     const map = new Map<string, Item[]>();
-    for (const it of items) {
+    for (const it of searching ? foundItems : items) {
       const k = dayKey(it.at);
       if (!map.has(k)) map.set(k, []);
       map.get(k)!.push(it);
     }
     return [...map.entries()];
-  }, [items]);
+  }, [items, foundItems, searching]);
 
   const rtf = useMemo(
     () =>
@@ -347,12 +494,17 @@ export const HomeFeed: React.FC<{
   const trialDays = daysLeft(status?.trial_ends_at);
   const empty = entries !== null && items.length === 0;
   const trialPost =
+    !open &&
     plan === "trial" &&
     trialDays !== null &&
     trialDays <= 3 &&
     dismissedTrial !== status?.trial_ends_at;
   const showCard =
-    !!status && !trialPost && (plan === "free" || (plan === "trial" && !empty));
+    !!status &&
+    !open &&
+    !trialPost &&
+    (plan === "free" || (plan === "trial" && !empty));
+  const noResults = searching && found?.q === termsKey && found.total === 0;
   const editingDay = groups.find(([, list]) =>
     list.some((i) => i.kind === "dictation" && i.entry.id === editingId),
   )?.[0];
@@ -377,7 +529,7 @@ export const HomeFeed: React.FC<{
         onOpenMeetings={onOpenMeetings}
       />
 
-      <main className="flex-1 overflow-y-auto">
+      <main ref={mainRef} className="flex-1 overflow-y-auto">
         <div className="max-w-[1040px] mx-auto px-7 max-[720px]:px-5 pt-7 pb-7">
           {empty ? (
             <EmptyHero keys={keys} mac={osType === "macos"} dark={dark} />
@@ -386,9 +538,30 @@ export const HomeFeed: React.FC<{
           )}
 
           <div className="pt-2">
+            {open && (
+              <SearchField
+                value={query}
+                onChange={setQuery}
+                onClose={closeSearch}
+                count={searching && found?.total ? found.total : null}
+                inputRef={searchRef}
+              />
+            )}
+
+            {noResults && (
+              <div className="flex flex-col items-center gap-2 py-14 text-center">
+                <p className="label-mono">{t("home.search.empty")}</p>
+                <p className="text-[15px] text-mid-gray break-words max-w-full">
+                  {t("home.search.emptyBody", { query: query?.trim() })}
+                </p>
+              </div>
+            )}
+
             {trialPost && (
               <section aria-label={t("home.fromElchi")}>
-                <DayHeader>{t("home.fromElchi")}</DayHeader>
+                <DayHeader aside={<SearchButton onClick={openSearch} />}>
+                  {t("home.fromElchi")}
+                </DayHeader>
                 <ElchiPost
                   dark={dark}
                   when={t("home.today")}
@@ -412,9 +585,15 @@ export const HomeFeed: React.FC<{
               </section>
             )}
 
-            {groups.map(([day, list]) => (
+            {groups.map(([day, list], k) => (
               <section key={day} aria-label={dayLabel(day)}>
-                <DayHeader>
+                <DayHeader
+                  aside={
+                    k === 0 &&
+                    !open &&
+                    !trialPost && <SearchButton onClick={openSearch} />
+                  }
+                >
                   {dayLabel(day)}
                   {day === editingDay && <> · {t("home.edit.editing")}</>}
                 </DayHeader>
@@ -437,6 +616,7 @@ export const HomeFeed: React.FC<{
                           getAudioUrl={getAudioUrl}
                           onToggleSaved={toggleSaved}
                           onDelete={deleteEntry}
+                          highlight={searching ? terms : undefined}
                         />
                       );
                     case "learned":
@@ -492,8 +672,20 @@ export const HomeFeed: React.FC<{
               </section>
             ))}
 
-            {hasMore && (
-              <div ref={sentinelRef} className="flex justify-center pt-5">
+            {searching && found?.q === termsKey && found.hasMore && (
+              <div ref={setFoundSentinel} className="flex justify-center pt-5">
+                <GhostButton onClick={loadMoreFound} disabled={foundLoading}>
+                  {foundLoading
+                    ? t("home.loading")
+                    : foundFailed
+                      ? t("home.moreFailed")
+                      : t("home.more")}
+                </GhostButton>
+              </div>
+            )}
+
+            {!searching && hasMore && (
+              <div ref={setSentinel} className="flex justify-center pt-5">
                 <GhostButton onClick={loadMore} disabled={loadingMore}>
                   {loadingMore
                     ? t("home.loading")
@@ -508,13 +700,16 @@ export const HomeFeed: React.FC<{
               <UpsellCard status={status} onUpgrade={onUpgrade} />
             )}
 
-            {entries !== null && entries.length > 0 && !hasMore && (
-              <div className="flex justify-center pt-5">
-                <GhostButton onClick={openFolder}>
-                  {t("home.openFolder")} ↗
-                </GhostButton>
-              </div>
-            )}
+            {!searching &&
+              entries !== null &&
+              entries.length > 0 &&
+              !hasMore && (
+                <div className="flex justify-center pt-5">
+                  <GhostButton onClick={openFolder}>
+                    {t("home.openFolder")} ↗
+                  </GhostButton>
+                </div>
+              )}
           </div>
         </div>
       </main>
