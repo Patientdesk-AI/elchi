@@ -17,7 +17,6 @@ import {
   type DictationStats,
   type DictionaryWord,
   type HistoryEntry,
-  type HistoryUpdatePayload,
 } from "@/bindings";
 import { daysLeft, useElchiPro } from "@/hooks/useElchiPro";
 import { useSettings } from "@/hooks/useSettings";
@@ -30,7 +29,8 @@ import { SearchButton, SearchField } from "./FeedSearch";
 import { TopBar } from "./TopBar";
 import { UpsellCard } from "./UpsellCard";
 import { EmptyHero, WeekHero } from "./WeekHero";
-import { dayKey, matchesSearch, pastedText, searchTerms } from "./text";
+import { appendFound, applyToFound, type Found } from "./searchResults";
+import { dayKey, pastedText, searchTerms } from "./text";
 import { useIsDark } from "./useIsDark";
 
 /** Dictations fetched per page; scrolling to the end fetches the next. */
@@ -52,53 +52,6 @@ type Item =
   | { kind: "learned"; at: number; word: DictionaryWord }
   | { kind: "streak"; at: number; days: number }
   | { kind: "milestone"; at: number; words: number };
-
-/** A page of search results: `q` is the folded words they were found for. */
-type Found = {
-  q: string;
-  entries: HistoryEntry[];
-  hasMore: boolean;
-  total: number;
-};
-
-/** A history change applied to the search results, as the feed applies it. */
-const applyToFound = (
-  prev: Found | null,
-  p: HistoryUpdatePayload,
-): Found | null => {
-  if (!prev) return prev;
-  switch (p.action) {
-    case "added":
-      return matchesSearch(p.entry, prev.q.split(" ")) &&
-        !prev.entries.some((e) => e.id === p.entry.id)
-        ? {
-            ...prev,
-            entries: [p.entry, ...prev.entries],
-            total: prev.total + 1,
-          }
-        : prev;
-    case "updated":
-      return {
-        ...prev,
-        entries: prev.entries.map((e) => (e.id === p.entry.id ? p.entry : e)),
-      };
-    case "deleted":
-      return prev.entries.some((e) => e.id === p.id)
-        ? {
-            ...prev,
-            entries: prev.entries.filter((e) => e.id !== p.id),
-            total: prev.total - 1,
-          }
-        : prev;
-    case "toggled":
-      return {
-        ...prev,
-        entries: prev.entries.map((e) =>
-          e.id === p.id ? { ...e, saved: !e.saved } : e,
-        ),
-      };
-  }
-};
 
 const DayHeader: React.FC<{
   children: React.ReactNode;
@@ -143,7 +96,12 @@ export const HomeFeed: React.FC<{
   const [dismissedTrial, setDismissedTrial] = useState(readDismissed);
   const entriesRef = useRef<HistoryEntry[] | null>(null);
   const loadingMoreRef = useRef(false);
-  const sentinelRef = useRef<HTMLDivElement>(null);
+  // The "load older" rows, kept in state: each remounts as a new element
+  // (searching swaps one for the other), and its scroll observer must follow.
+  const [sentinel, setSentinel] = useState<HTMLDivElement | null>(null);
+  const [foundSentinel, setFoundSentinel] = useState<HTMLDivElement | null>(
+    null,
+  );
   // Search: the query while the field is open (null when closed), and the
   // results the backend found for it.
   const [query, setQuery] = useState<string | null>(null);
@@ -154,7 +112,8 @@ export const HomeFeed: React.FC<{
   const foundLoadingRef = useRef(false);
   // Bumped on every new query, so answers to older ones are dropped.
   const searchSeq = useRef(0);
-  const foundSentinelRef = useRef<HTMLDivElement>(null);
+  // The folded words being searched for now, for callbacks that outlive a query.
+  const termsRef = useRef("");
   const mainRef = useRef<HTMLElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   // Where the feed was scrolled when the search opened, restored on close.
@@ -261,14 +220,13 @@ export const HomeFeed: React.FC<{
 
   // Older pages load when the end of the feed scrolls into view.
   useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el || !hasMore || moreFailed) return;
+    if (!sentinel || !hasMore || moreFailed) return;
     const io = new IntersectionObserver((seen) => {
       if (seen[0]?.isIntersecting) loadMore();
     });
-    io.observe(el);
+    io.observe(sentinel);
     return () => io.disconnect();
-  }, [hasMore, moreFailed, loadMore]);
+  }, [sentinel, hasMore, moreFailed, loadMore]);
 
   const terms = useMemo(() => searchTerms(query ?? ""), [query]);
   const termsKey = terms.join(" ");
@@ -277,6 +235,7 @@ export const HomeFeed: React.FC<{
   // The backend searches the whole history, a moment after typing stops.
   useEffect(() => {
     const seq = ++searchSeq.current;
+    termsRef.current = termsKey;
     setFoundFailed(false);
     if (!termsKey) {
       setFound(null);
@@ -304,8 +263,10 @@ export const HomeFeed: React.FC<{
   const loadMoreFound = useCallback(async () => {
     const cur = foundRef.current;
     const last = cur?.entries[cur.entries.length - 1];
+    // The results shown may still be for the previous query while the new
+    // one loads; paging them would mix the two.
     if (!cur || !last || foundLoadingRef.current) return;
-    const seq = searchSeq.current;
+    if (cur.q !== termsRef.current) return;
     foundLoadingRef.current = true;
     setFoundLoading(true);
     const r = await commands
@@ -313,35 +274,23 @@ export const HomeFeed: React.FC<{
       .catch(() => ({ status: "error" as const }));
     foundLoadingRef.current = false;
     setFoundLoading(false);
-    if (seq !== searchSeq.current) return;
+    if (cur.q !== termsRef.current) return;
     if (r.status !== "ok") {
       setFoundFailed(true);
       return;
     }
     setFoundFailed(false);
-    setFound((prev) => {
-      if (!prev) return prev;
-      const have = new Set(prev.entries.map((e) => e.id));
-      return {
-        ...prev,
-        entries: [
-          ...prev.entries,
-          ...r.data.entries.filter((e) => !have.has(e.id)),
-        ],
-        hasMore: r.data.has_more,
-      };
-    });
+    setFound((prev) => appendFound(prev, cur.q, r.data));
   }, []);
 
   useEffect(() => {
-    const el = foundSentinelRef.current;
-    if (!el || !found?.hasMore || foundFailed) return;
+    if (!foundSentinel || !found?.hasMore || foundFailed) return;
     const io = new IntersectionObserver((seen) => {
       if (seen[0]?.isIntersecting) loadMoreFound();
     });
-    io.observe(el);
+    io.observe(foundSentinel);
     return () => io.disconnect();
-  }, [found?.hasMore, foundFailed, loadMoreFound]);
+  }, [foundSentinel, found?.hasMore, foundFailed, loadMoreFound]);
 
   const openSearch = useCallback(() => {
     setQuery((q) => {
@@ -723,8 +672,8 @@ export const HomeFeed: React.FC<{
               </section>
             ))}
 
-            {searching && found?.hasMore && (
-              <div ref={foundSentinelRef} className="flex justify-center pt-5">
+            {searching && found?.q === termsKey && found.hasMore && (
+              <div ref={setFoundSentinel} className="flex justify-center pt-5">
                 <GhostButton onClick={loadMoreFound} disabled={foundLoading}>
                   {foundLoading
                     ? t("home.loading")
@@ -736,7 +685,7 @@ export const HomeFeed: React.FC<{
             )}
 
             {!searching && hasMore && (
-              <div ref={sentinelRef} className="flex justify-center pt-5">
+              <div ref={setSentinel} className="flex justify-center pt-5">
                 <GhostButton onClick={loadMore} disabled={loadingMore}>
                   {loadingMore
                     ? t("home.loading")
