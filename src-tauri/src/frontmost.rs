@@ -1,7 +1,7 @@
 //! The app a dictation went into: the frontmost application when it is saved, which
-//! is the one Elchi pastes into (its own overlay never takes focus). Shown on the
+//! is the one Eshlik pastes into (its own overlay never takes focus). Shown on the
 //! home feed ("Mail · 2 dk"). None when it cannot be told, on Linux, or when it is
-//! Elchi itself.
+//! Eshlik itself.
 
 #[cfg(target_os = "macos")]
 pub fn app_name() -> Option<String> {
@@ -9,7 +9,9 @@ pub fn app_name() -> Option<String> {
     let workspace = NSWorkspace::sharedWorkspace();
     let app = workspace.frontmostApplication()?;
     let name = app.localizedName()?.to_string();
-    if name.is_empty() || name == "Elchi" {
+    // Itself told by process, not by name: the name changed once (Elchi -> Eshlik),
+    // and a dev build or an old bundle may still carry either.
+    if name.is_empty() || app.processIdentifier() == std::process::id() as i32 {
         return None;
     }
     if let Some(bundle) = app.bundleURL().and_then(|u| u.path()) {
@@ -252,6 +254,6 @@ mod tests {
             Some("Cursor")
         );
         assert_eq!(windows_app_name(r"C:\Windows\explorer.exe"), None);
-        assert_eq!(windows_app_name(r"C:\Program Files\Elchi\elchi.exe"), None);
+        assert_eq!(windows_app_name(r"C:\Program Files\Eshlik\elchi.exe"), None);
     }
 }

@@ -1,6 +1,6 @@
 # Third-party notices
 
-Elchi is a fork of [Handy](https://github.com/cjpais/Handy), under the MIT
+Eshlik is a fork of [Handy](https://github.com/cjpais/Handy), under the MIT
 License in [LICENSE](LICENSE). It also includes the following.
 
 ## Duyu-small reference engine
@@ -11,7 +11,7 @@ https://huggingface.co/KaanAydinli/Duyu-small. The original is licensed under th
 Apache License, Version 2.0. The port translates it from Python to Rust and
 changes it (feature extraction, decoding and model loading are reimplemented on
 ONNX Runtime and ndarray). The model files themselves are not part of this
-repository; Elchi downloads them from that page at a pinned revision, under the
+repository; Eshlik downloads them from that page at a pinned revision, under the
 same license.
 
     Licensed under the Apache License, Version 2.0 (the "License");

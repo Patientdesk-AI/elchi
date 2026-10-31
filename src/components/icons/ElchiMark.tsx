@@ -1,6 +1,6 @@
 import React from "react";
 
-/** Elchi's mark: an "E" of three bars, each cut on the diagonal at its right
+/** Eshlik's mark: an "E" of three bars, each cut on the diagonal at its right
  *  end, the middle one shorter. Drawn in a 140×135 box. */
 export const MARK_PATH =
   "M0 0H140L109 31H0Z M0 52H104L73 83H0Z M0 104H140L109 135H0Z";

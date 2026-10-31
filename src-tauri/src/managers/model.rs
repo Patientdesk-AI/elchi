@@ -23,10 +23,10 @@ mod download;
 
 use download::{HttpDownloadOutcome, DOWNLOAD_STALL_TIMEOUT};
 
-/// Elchi's default model.
+/// Eshlik's default model.
 pub const DUYU_MODEL_ID: &str = "duyu-small";
 
-/// Elchi ships only its own models. Handy's model registry (built-in list,
+/// Eshlik ships only its own models. Handy's model registry (built-in list,
 /// bundled catalog, on-disk discovery) is left in place to keep merges with
 /// upstream simple, and filtered down to these ids wherever it is filled.
 fn is_elchi_model(id: &str) -> bool {
@@ -46,7 +46,7 @@ pub enum EngineType {
     GigaAM,
     Canary,
     Cohere,
-    /// Duyu-small, Elchi's Turkish + English recognizer (crate::duyu).
+    /// Duyu-small, Eshlik's Turkish + English recognizer (crate::duyu).
     Duyu,
 }
 
@@ -212,7 +212,7 @@ pub struct ModelDescriptor {
     /// Whether this is part of the small curated set shown to new users in
     /// onboarding (and badged "Recommended"). A model can be ranked for ordering
     /// without being in this set.
-    #[allow(dead_code)] // Elchi recommends only Duyu-small; see render_model_info.
+    #[allow(dead_code)] // Eshlik recommends only Duyu-small; see render_model_info.
     pub recommended: bool,
 }
 
@@ -277,7 +277,7 @@ impl ModelDescriptor {
             accuracy_score: self.accuracy_score,
             speed_score: self.speed_score,
             supports_translation: self.caps.supports_translation.unwrap_or(false),
-            // Elchi recommends only its own Duyu-small; catalog models stay
+            // Eshlik recommends only its own Duyu-small; catalog models stay
             // available but unbadged.
             is_recommended: false,
             supports_language_selection: languages.len() > 1,
@@ -1157,7 +1157,7 @@ impl ModelManager {
             },
         );
 
-        // Duyu-small: Elchi's own Turkish + English model, the default.
+        // Duyu-small: Eshlik's own Turkish + English model, the default.
         // int8 graphs at a pinned revision of the Hugging Face repo.
         let duyu_files = [
             (
@@ -1448,7 +1448,7 @@ impl ModelManager {
         // priority), then any other recommended model, then by accuracy, speed,
         // and name. `ModelInfo` doesn't carry rank, so resolve it by id from the
         // catalog here.
-        // Duyu-small, Elchi's own model, always leads.
+        // Duyu-small, Eshlik's own model, always leads.
         list.sort_by(|a, b| {
             (a.id != DUYU_MODEL_ID)
                 .cmp(&(b.id != DUYU_MODEL_ID))
@@ -3402,7 +3402,7 @@ mod tests {
         };
         let status = DiskStatus::default();
 
-        // Default quant: plain name. No badge: Elchi recommends only Duyu-small.
+        // Default quant: plain name. No badge: Eshlik recommends only Duyu-small.
         let default_info = desc.to_model_info(&status);
         assert_eq!(default_info.name, "Model");
         assert!(!default_info.is_recommended);

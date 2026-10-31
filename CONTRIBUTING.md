@@ -1,12 +1,12 @@
-# Contributing to Elchi
+# Contributing to Eshlik
 
-Thank you for your interest in contributing to Elchi. This guide explains how to set up the project, report problems, and send changes.
+Thank you for your interest in contributing to Eshlik. This guide explains how to set up the project, report problems, and send changes.
 
-Elchi is a fork of [Handy](https://github.com/cjpais/Handy) by CJ Pais and contributors. Much of the codebase is theirs, so if you find a bug that also exists upstream, consider reporting it to Handy as well.
+Eshlik is a fork of [Handy](https://github.com/cjpais/Handy) by CJ Pais and contributors. Much of the codebase is theirs, so if you find a bug that also exists upstream, consider reporting it to Handy as well.
 
 ## Philosophy
 
-We want Elchi to be a useful dictation tool and a codebase that stays simple enough for others to read and build on. We prioritize:
+We want Eshlik to be a useful dictation tool and a codebase that stays simple enough for others to read and build on. We prioritize:
 
 - **Simplicity**: Clear, maintainable code over clever solutions
 - **Extensibility**: Make it easy for others to fork and customize
@@ -136,7 +136,7 @@ Before writing any code, please do the following:
    - Discuss it first in an issue in this repository
    - Link to that issue in your PR
 
-3. **Talk about features before building them** - Open an issue describing the feature before writing a large change, and link to it in your PR. This keeps Elchi focused and saves you from work that may not be merged.
+3. **Talk about features before building them** - Open an issue describing the feature before writing a large change, and link to it in your PR. This keeps Eshlik focused and saves you from work that may not be merged.
 
 ### Development Workflow
 
@@ -284,4 +284,4 @@ If you are stuck, open an issue in this repository and describe what you tried.
 
 ## License
 
-By contributing to Elchi, you agree that your contributions will be licensed under the MIT License. See [LICENSE](LICENSE) for details.
+By contributing to Eshlik, you agree that your contributions will be licensed under the MIT License. See [LICENSE](LICENSE) for details.

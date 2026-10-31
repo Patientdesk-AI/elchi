@@ -1,7 +1,7 @@
 /**
  * A meeting's notes as the server writes them (POST /v1/elchi/notes): a "# " title,
  * "## " sections, "- " bullets and "- [ ] " to-dos. A section whose heading is one of the
- * user's own lines is theirs: they wrote the heading, Elchi wrote what is under it.
+ * user's own lines is theirs: they wrote the heading, Eshlik wrote what is under it.
  * Lenient about the model's slips ("- - [ ]", trailing spaces).
  */
 

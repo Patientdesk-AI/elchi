@@ -1,6 +1,6 @@
-name: "Elchi Windows build"
+name: "Eshlik Windows build"
 
-# Builds the Windows (x64) installer with Elchi's updater signature and keeps
+# Builds the Windows (x64) installer with Eshlik's updater signature and keeps
 # it as a workflow artifact; scripts/release/publish.py takes it from there.
 # A smoke test then installs it on a clean runner and transcribes a Turkish
 # clip with Duyu-small, so a broken build never gets published.

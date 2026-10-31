@@ -13,7 +13,7 @@ export const daysLeft = (iso: string | null | undefined): number | null => {
 };
 
 /**
- * The Duyu Pro plan (trial / Elchi Pro / free), kept current from the
+ * The Duyu Pro plan (trial / Eshlik Pro / free), kept current from the
  * backend's `elchi-pro-changed` events and re-checked when the window gains
  * focus, so an upgrade made in the browser shows up as soon as the user comes
  * back.

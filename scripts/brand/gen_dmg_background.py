@@ -4,7 +4,9 @@
 
 Writes scripts/release/dmg/background.tiff: the 660x420 picture at 1x and 2x in one
 file, which Finder shows at the right density. Needs Google Chrome (Playwright drives
-the installed one) and macOS's tiffutil.
+the installed one) and macOS's tiffutil. The page's Outfit and Karla fonts load from
+node_modules/@fontsource-variable/{outfit,karla}, which the app no longer depends on:
+unpack them there first (`npm pack`), or the text renders in fallback fonts.
 """
 
 import subprocess

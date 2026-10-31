@@ -1,4 +1,4 @@
-//! Commands behind Elchi's Duyu Pro status (see crate::elchi_pro).
+//! Commands behind Eshlik's Duyu Pro status (see crate::elchi_pro).
 
 use std::sync::Arc;
 
@@ -28,7 +28,7 @@ pub async fn refresh_elchi_pro(elchi: State<'_, Arc<ElchiPro>>) -> Result<ElchiP
     .map_err(|e| e.to_string())?
 }
 
-/// Opens the Elchi Pro page in the browser and watches for the activation.
+/// Opens the Eshlik Pro page in the browser and watches for the activation.
 #[tauri::command]
 #[specta::specta]
 pub async fn open_elchi_upgrade(elchi: State<'_, Arc<ElchiPro>>) -> Result<(), String> {
@@ -54,7 +54,7 @@ pub fn set_elchi_use_pro(
     status
 }
 
-/// Whether dictated text goes to Elchi's formatter before it is pasted.
+/// Whether dictated text goes to Eshlik's formatter before it is pasted.
 #[tauri::command]
 #[specta::specta]
 pub fn set_elchi_format(

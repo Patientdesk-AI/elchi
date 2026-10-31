@@ -209,7 +209,7 @@ pub async fn cancel_download(
         .map_err(|e| e.to_string())
 }
 
-/// Ends first-run onboarding without a model step: Elchi has one local model.
+/// Ends first-run onboarding without a model step: Eshlik has one local model.
 /// If Duyu-small is on disk it is selected now; otherwise it downloads in the
 /// background and is selected when it lands (dictation meanwhile goes to Duyu
 /// Pro during the trial).

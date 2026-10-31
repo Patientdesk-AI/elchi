@@ -93,7 +93,7 @@ export const AppTile: React.FC<{
   );
 };
 
-/** Elchi's own tile: the E mark on a blue tint. */
+/** Eshlik's own tile: the E mark on a blue tint. */
 export const ElchiTile: React.FC<{ dark: boolean }> = ({ dark }) => (
   <span
     aria-hidden="true"

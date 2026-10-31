@@ -122,8 +122,8 @@ impl<W: Write + Seek> OpusWriter<W> {
             INFO,
             &[
                 uint(TIMESTAMP_SCALE, 1_000_000), // times in milliseconds
-                element(MUXING_APP, b"Elchi"),
-                element(WRITING_APP, b"Elchi"),
+                element(MUXING_APP, b"Eshlik"),
+                element(WRITING_APP, b"Eshlik"),
                 float(DURATION, 0.0), // last: `finish` overwrites its eight bytes
             ]
             .concat(),

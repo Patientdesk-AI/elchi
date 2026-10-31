@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Elchi",
+  "productName": "Eshlik",
   "version": "1.0.8",
   "identifier": "com.elchi.app",
   "build": {
@@ -50,9 +50,12 @@
       "deb": {
         "depends": ["libgtk-layer-shell0", "libopenblas0"],
         "files": {
-          "/usr/lib/Elchi": "transcribe-libs"
+          "/usr/lib/Eshlik": "transcribe-libs"
         },
-        "recommends": ["xdotool", "wtype"]
+        "recommends": ["xdotool", "wtype"],
+        "provides": ["elchi"],
+        "conflicts": ["elchi"],
+        "replaces": ["elchi"]
       },
       "rpm": {
         "depends": [
@@ -63,8 +66,10 @@
           "type": "none"
         },
         "files": {
-          "/usr/lib/Elchi": "transcribe-libs"
-        }
+          "/usr/lib/Eshlik": "transcribe-libs"
+        },
+        "provides": ["elchi"],
+        "obsoletes": ["elchi"]
       },
       "appimage": {
         "bundleMediaFramework": true,

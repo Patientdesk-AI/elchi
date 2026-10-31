@@ -1,4 +1,4 @@
-/* Surface recipes from the Elchi style sheet (Claude Design, "Elchi Redesign"
+/* Surface recipes from the Eshlik style sheet (Claude Design, "Eshlik Redesign"
  * 4c). Each recipe is one class; its values are theme tokens so the same
  * class reads as graphite steel in dark and light steel in light.
  *
@@ -283,7 +283,7 @@
     box-shadow: 0 0 12px var(--color-live);
   }
 
-  /* Blue gem: success checks, the active step, Elchi's own posts. */
+  /* Blue gem: success checks, the active step, Eshlik's own posts. */
   .gem {
     border-radius: 50%;
     background: conic-gradient(

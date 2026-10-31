@@ -8,7 +8,7 @@ fn main() {
     // backend modules (the `dynamic-backends` posture in Cargo.toml). Bake an
     // $ORIGIN-relative rpath into the `elchi` binary so it finds libtranscribe
     // next to it in the package — deb/rpm install into the app-private
-    // `/usr/lib/Elchi` (the dir tauri already uses for resources; keeps
+    // `/usr/lib/Eshlik` (the dir tauri already uses for resources; keeps
     // the app's libs out of the ldconfig-scanned `/usr/lib`, issue #1639) while
     // the AppImage keeps them in `usr/lib` (linuxdeploy's layout), hence both
     // entries. transcribe's
@@ -16,7 +16,7 @@ fn main() {
     // (Windows resolves DLLs from the exe directory, so it needs no rpath;
     // macOS links transcribe-cpp statically via the `metal` feature.)
     if std::env::var("CARGO_CFG_TARGET_OS").as_deref() == Ok("linux") {
-        println!("cargo:rustc-link-arg=-Wl,-rpath,$ORIGIN/../lib/Elchi:$ORIGIN/../lib");
+        println!("cargo:rustc-link-arg=-Wl,-rpath,$ORIGIN/../lib/Eshlik:$ORIGIN/../lib");
     }
 
     // CPAL (handy-recorder's and rodio's) links two CoreAudio functions that
@@ -167,7 +167,7 @@ fn stage_onnxruntime_dll() {
 /// ggml modules) may be the same dir — the `BTreeSet` below dedups them.
 ///
 /// Where the staged dir lands: Windows bundles it beside `elchi.exe` (DLLs resolve
-/// from the exe dir); Linux deb/rpm map it into the app-private `/usr/lib/Elchi`
+/// from the exe dir); Linux deb/rpm map it into the app-private `/usr/lib/Eshlik`
 /// and the AppImage into `usr/lib`, both on the binary's rpath.
 fn stage_transcribe_runtime_libs() {
     use std::collections::BTreeSet;

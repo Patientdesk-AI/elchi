@@ -107,7 +107,7 @@ const PracticeMeter: React.FC<{ live: boolean }> = ({ live }) => {
 };
 
 /**
- * First-run tour, after the permissions: what Elchi does and why it is worth
+ * First-run tour, after the permissions: what Eshlik does and why it is worth
  * it, how to dictate with the user's own shortcut, and a practice box to try
  * it once before using it anywhere.
  */
@@ -136,7 +136,7 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ onDone }) => {
   const activation = settings?.shortcut_activation ?? "hold_or_toggle";
 
   // A dictation made during the practice step lands in the practice box (it
-  // is focused, so Elchi pastes into it); the history event is a fallback for
+  // is focused, so Eshlik pastes into it); the history event is a fallback for
   // when pasting into our own window doesn't go through. The overlay's
   // show/hide events and the live stream text (broadcast to every window)
   // drive the panel's listening state while the user speaks.

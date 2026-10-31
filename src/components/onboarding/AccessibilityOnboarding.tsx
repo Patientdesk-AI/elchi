@@ -325,7 +325,7 @@ const AccessibilityOnboarding: React.FC<AccessibilityOnboardingProps> = ({
     return () => clearTimeout(timer);
   }, [waiting]);
 
-  // macOS can keep an entry from an earlier, differently signed Elchi: it looks
+  // macOS can keep an entry from an earlier, differently signed Eshlik: it looks
   // switched on in System Settings but is refused. Clearing it makes the next
   // "Allow" add a fresh one.
   const handleReset = async () => {

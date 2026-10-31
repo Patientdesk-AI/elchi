@@ -1,4 +1,4 @@
-//! The bits of the macOS Accessibility API Elchi reads other apps through: the
+//! The bits of the macOS Accessibility API Eshlik reads other apps through: the
 //! dictionary's correction watch (crate::dictionary::watch) and the check for a text
 //! field before pasting (crate::paste_target).
 

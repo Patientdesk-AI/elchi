@@ -26,7 +26,7 @@ const RemoveKnob: React.FC<{ label: string; onClick: () => void }> = ({
 
 /**
  * The personal dictionary (src-tauri/src/dictionary), frame 2c: names, brands
- * and terms as steel chips with how Elchi misheard them, the phrases it
+ * and terms as steel chips with how Eshlik misheard them, the phrases it
  * misheard as a ledger, and whether corrections teach it. The page title and
  * counts come from the settings shell; this is the body.
  */

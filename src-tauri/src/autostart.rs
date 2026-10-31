@@ -11,6 +11,10 @@
 use tauri::AppHandle;
 use tauri_plugin_autostart::ManagerExt;
 
+/// The app's name up to 1.0.8. The plugin names its login entry after the
+/// app, so an entry made then is still called this.
+const LEGACY_APP_NAME: &str = "Elchi";
+
 /// Apply the user's autostart preference using the best mechanism for the
 /// current platform.
 ///
@@ -26,6 +30,10 @@ pub fn apply_autostart(app: &AppHandle, enabled: bool) {
         return;
     }
 
+    // An entry under the old name would start the app a second time; the
+    // preference is applied under the current name just below.
+    remove_legacy_entry();
+
     let manager = app.autolaunch();
     let result = if enabled {
         manager.enable()
@@ -38,6 +46,46 @@ pub fn apply_autostart(app: &AppHandle, enabled: bool) {
             enabled,
             e
         );
+    }
+}
+
+/// Removes the login entry the plugin made under [`LEGACY_APP_NAME`]: on
+/// Windows a value under the current user's `Run` key, on Linux an
+/// `~/.config/autostart` file, on macOS before 13 a launch agent (as the
+/// auto-launch crate writes them).
+fn remove_legacy_entry() {
+    #[cfg(target_os = "macos")]
+    if let Some(home) = std::env::var_os("HOME") {
+        macos::remove_launch_agent_file(&macos::plugin_launch_agent_path(
+            std::path::Path::new(&home),
+            LEGACY_APP_NAME,
+        ));
+    }
+    #[cfg(target_os = "windows")]
+    {
+        use winreg::enums::{HKEY_CURRENT_USER, KEY_SET_VALUE};
+        let run = winreg::RegKey::predef(HKEY_CURRENT_USER).open_subkey_with_flags(
+            r"Software\Microsoft\Windows\CurrentVersion\Run",
+            KEY_SET_VALUE,
+        );
+        if let Ok(run) = run {
+            match run.delete_value(LEGACY_APP_NAME) {
+                Ok(()) => log::info!("Removed legacy autostart entry {LEGACY_APP_NAME}"),
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
+                Err(e) => log::warn!("Failed to remove legacy autostart entry: {e}"),
+            }
+        }
+    }
+    #[cfg(target_os = "linux")]
+    if let Some(home) = std::env::var_os("HOME") {
+        let file = std::path::Path::new(&home)
+            .join(".config/autostart")
+            .join(format!("{LEGACY_APP_NAME}.desktop"));
+        match std::fs::remove_file(&file) {
+            Ok(()) => log::info!("Removed legacy autostart entry {file:?}"),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
+            Err(e) => log::warn!("Failed to remove legacy autostart entry {file:?}: {e}"),
+        }
     }
 }
 
@@ -95,18 +143,20 @@ mod macos {
         let Ok(home) = app.path().home_dir() else {
             return;
         };
-        remove_launch_agent_file(&plugin_launch_agent_path(&home, &app.package_info().name));
+        for name in [app.package_info().name.as_str(), super::LEGACY_APP_NAME] {
+            remove_launch_agent_file(&plugin_launch_agent_path(&home, name));
+        }
     }
 
     /// Path of the plist the auto-launch crate writes:
     /// `~/Library/LaunchAgents/{app name}.plist`.
-    fn plugin_launch_agent_path(home: &Path, app_name: &str) -> PathBuf {
+    pub fn plugin_launch_agent_path(home: &Path, app_name: &str) -> PathBuf {
         home.join("Library")
             .join("LaunchAgents")
             .join(format!("{}.plist", app_name))
     }
 
-    fn remove_launch_agent_file(path: &Path) {
+    pub fn remove_launch_agent_file(path: &Path) {
         match std::fs::remove_file(path) {
             Ok(()) => log::info!("Removed legacy autostart launch agent {:?}", path),
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}

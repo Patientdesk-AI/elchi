@@ -1,6 +1,6 @@
-# Contributing Translations to Elchi
+# Contributing Translations to Eshlik
 
-Thank you for helping translate Elchi! This guide explains how to add or improve translations.
+Thank you for helping translate Eshlik! This guide explains how to add or improve translations.
 
 ## Quick Start
 
@@ -120,7 +120,7 @@ Found a typo or better translation?
 
 ### Don't:
 
-- Translate brand names (Elchi, Duyu, transcribe.cpp, ggml, OpenAI)
+- Translate brand names (Eshlik, Duyu, transcribe.cpp, ggml, OpenAI)
 - Change or remove `{{variables}}`
 - Modify JSON keys
 - Add extra spaces or formatting
@@ -161,4 +161,4 @@ We welcome additional languages that are not yet in the [locale folders](src/i18
 
 ---
 
-Thank you for making Elchi accessible to more people around the world!
+Thank you for making Eshlik accessible to more people around the world!

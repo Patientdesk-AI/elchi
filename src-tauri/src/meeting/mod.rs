@@ -1,10 +1,10 @@
-//! Meeting notes, the Granola way: Elchi records the user's microphone and the call's audio
+//! Meeting notes, the Granola way: Eshlik records the user's microphone and the call's audio
 //! as two tracks (so it knows who said what without guessing voices), transcribes each as
 //! it is spoken, one line per utterance with its own start and end (lane.rs: streamed to
 //! Duyu Pro, or cut at pauses on this device), and when it ends writes notes from that
 //! conversation and the user's own rough notes (Duyu Pro, on PatientDesk's servers:
 //! POST /v1/elchi/notes).
-//! Nothing joins the call; macOS shows its own recording indicators, and Elchi's windows are
+//! Nothing joins the call; macOS shows its own recording indicators, and Eshlik's windows are
 //! left out of screen sharing while a meeting is recorded.
 //!
 //! By default only the notes stay: no audio is written, and the transcript is deleted once
@@ -113,13 +113,13 @@ fn audio_dir(app: &AppHandle, id: i64) -> Option<std::path::PathBuf> {
 /// At startup: meetings cut short by a quit keep their transcript, marked as interrupted.
 pub fn init(app: &AppHandle) {
     match db(app).and_then(|c| store::mark_interrupted(&c).map_err(|e| e.to_string())) {
-        Ok(n) if n > 0 => warn!("{n} meeting(s) were interrupted when Elchi last quit"),
+        Ok(n) if n > 0 => warn!("{n} meeting(s) were interrupted when Eshlik last quit"),
         Ok(_) => {}
         Err(e) => error!("Meetings: could not check for interrupted meetings: {e}"),
     }
 }
 
-/// Elchi's windows are left out of screen sharing and screenshots while a meeting is recorded.
+/// Eshlik's windows are left out of screen sharing and screenshots while a meeting is recorded.
 pub fn hide_from_capture(window: &tauri::WebviewWindow, hidden: bool) {
     #[cfg(target_os = "macos")]
     {
@@ -381,7 +381,7 @@ fn elchi_pro(app: &AppHandle) -> Result<Arc<crate::elchi_pro::ElchiPro>, String>
         .ok_or_else(|| "failed".to_string())
 }
 
-/// The Duyu Pro token, which only the trial and Elchi Pro get.
+/// The Duyu Pro token, which only the trial and Eshlik Pro get.
 async fn cloud_token(elchi: &Arc<crate::elchi_pro::ElchiPro>) -> Result<String, String> {
     let elchi = elchi.clone();
     blocking(move || Ok(elchi.cloud_token()))
@@ -936,7 +936,7 @@ fn overlaps(a: (usize, usize), b: (usize, usize)) -> bool {
 }
 
 /// The language a meeting was held in (Turkish or English), from what was said and
-/// written: the notes are in it, whatever language Elchi's own screens are in. None when
+/// written: the notes are in it, whatever language Eshlik's own screens are in. None when
 /// there is too little to tell.
 fn language_of(texts: &[&str]) -> Option<&'static str> {
     const TR: &[&str] = &[

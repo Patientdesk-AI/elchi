@@ -1,4 +1,4 @@
-//! Whether there is anywhere to paste, on macOS: before pressing Cmd+V, Elchi asks the
+//! Whether there is anywhere to paste, on macOS: before pressing Cmd+V, Eshlik asks the
 //! frontmost app (through Accessibility, which pasting already needs) what has focus.
 //! When it is sure nothing that takes text does (the desktop, a Finder window, a list
 //! or a button), the dictation is held for the overlay's Copy button instead of being
@@ -168,7 +168,7 @@ pub fn check() -> Target {
         return Target::Unknown;
     };
     let pid = front.processIdentifier();
-    // Elchi's own windows: asking itself from the main thread would wait on itself.
+    // Eshlik's own windows: asking itself from the main thread would wait on itself.
     if pid as u32 == std::process::id() {
         return Target::Unknown;
     }

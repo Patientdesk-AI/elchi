@@ -1,8 +1,8 @@
 [package]
 name = "elchi"
 version = "1.0.8"
-description = "Elchi: on-device speech-to-text dictation"
-authors = ["Elchi contributors"]
+description = "Eshlik: on-device speech-to-text dictation"
+authors = ["Eshlik contributors"]
 edition = "2021"
 license = "MIT"
 default-run = "elchi"

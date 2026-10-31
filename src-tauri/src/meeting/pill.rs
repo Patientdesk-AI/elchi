@@ -1,12 +1,12 @@
 //! The meeting pill: while a meeting is recorded, a tiny floating pill at the right edge of
-//! the screen (Elchi's mark and both sides' levels), like Granola's. Hovering it opens the
-//! live transcript beside it; clicking it brings Elchi's window to the meeting. It never
+//! the screen (Eshlik's mark and both sides' levels), like Granola's. Hovering it opens the
+//! live transcript beside it; clicking it brings Eshlik's window to the meeting. It never
 //! takes focus, sits above full-screen apps, and is left out of screen sharing.
 //!
-//! Like the recording overlay, the panel is created once, hidden, when Elchi starts, and
+//! Like the recording overlay, the panel is created once, hidden, when Eshlik starts, and
 //! then only shown and hidden: made at the meeting's start, its page had not drawn yet and
-//! the pill stayed invisible until Elchi's window was brought up; and destroying an NSPanel
-//! that tauri-nspanel made crashed Elchi (an abort on the main thread as a meeting ended).
+//! the pill stayed invisible until Eshlik's window was brought up; and destroying an NSPanel
+//! that tauri-nspanel made crashed Eshlik (an abort on the main thread as a meeting ended).
 //!
 //! The panel cannot reliably see the mouse itself (WebKit tracks hover only in the key
 //! window, and a non-activating panel never is one), so a thread watches the cursor and
@@ -302,7 +302,7 @@ fn watch(app: AppHandle) {
     });
 }
 
-/// The pill was clicked: Elchi's window, on the meeting.
+/// The pill was clicked: Eshlik's window, on the meeting.
 #[tauri::command]
 #[specta::specta]
 pub fn open_meeting_from_pill(app: AppHandle) {

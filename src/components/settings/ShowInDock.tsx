@@ -8,7 +8,7 @@ interface ShowInDockProps {
   grouped?: boolean;
 }
 
-/** macOS: keep Elchi in the Dock while its window is closed. */
+/** macOS: keep Eshlik in the Dock while its window is closed. */
 export const ShowInDock: React.FC<ShowInDockProps> = React.memo(
   ({ descriptionMode = "tooltip", grouped = false }) => {
     const { t } = useTranslation();

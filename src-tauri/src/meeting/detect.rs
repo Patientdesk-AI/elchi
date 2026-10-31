@@ -6,7 +6,7 @@
 //!
 //! macOS 14 lists the processes that have audio open and whether each is recording
 //! (`kAudioHardwarePropertyProcessObjectList`, `kAudioProcessPropertyIsRunningInput`), so
-//! a thread looks every couple of seconds. Elchi's own recording (dictation, a meeting)
+//! a thread looks every couple of seconds. Eshlik's own recording (dictation, a meeting)
 //! is never counted.
 #![cfg_attr(not(target_os = "macos"), allow(dead_code, unused_imports))]
 
@@ -22,7 +22,7 @@ use super::pill;
 use crate::settings::get_settings;
 
 const POLL: Duration = Duration::from_secs(2);
-/// Polls in a row a call app must hold the microphone before Elchi asks (4-6 s): opening
+/// Polls in a row a call app must hold the microphone before Eshlik asks (4-6 s): opening
 /// a call's settings or a browser's voice search should not.
 const ON_POLLS: u32 = 3;
 /// Polls in a row without the call app before asking whether the meeting is over (8-10 s):
@@ -196,7 +196,7 @@ fn poll(app: &AppHandle) {
     }
 }
 
-/// The call apps that have the microphone open now, each once; never Elchi itself.
+/// The call apps that have the microphone open now, each once; never Eshlik itself.
 #[cfg(target_os = "macos")]
 fn mic_users() -> Vec<&'static str> {
     use core_foundation::base::TCFType;
@@ -298,7 +298,7 @@ fn mic_users() -> Vec<&'static str> {
 }
 
 /// The prompt's "Take notes". The first meeting shows the recording disclosure first, in
-/// Elchi's window.
+/// Eshlik's window.
 #[tauri::command]
 #[specta::specta]
 pub async fn meeting_prompt_start(app: AppHandle) -> Result<(), String> {

@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Create a report to help us improve Elchi
+about: Create a report to help us improve Eshlik
 title: "[BUG] "
 labels: ["bug"]
 assignees: ""

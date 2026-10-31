@@ -10,10 +10,10 @@ import {
 } from "@/components/meetings/liveTranscript";
 
 /**
- * The meeting pill (src-tauri/src/meeting/pill.rs): Elchi's mark and a level meter at the
+ * The meeting pill (src-tauri/src/meeting/pill.rs): Eshlik's mark and a level meter at the
  * screen's edge while a meeting is recorded. Hovering it (the backend watches the cursor
  * and sends `meeting-pill-open`) opens the live transcript beside it; clicking it opens the
- * meeting in Elchi. Always dark, so it reads on any wallpaper or app.
+ * meeting in Eshlik. Always dark, so it reads on any wallpaper or app.
  *
  * The same window asks when a call starts ("take notes?", without the pill) and when the
  * call app lets the microphone go mid-meeting ("stop the notes?", beside it): see

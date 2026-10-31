@@ -8,7 +8,7 @@ interface SmartFormattingProps {
   grouped?: boolean;
 }
 
-/** Elchi's formatter (on every plan): dictation laid out before it is pasted. */
+/** Eshlik's formatter (on every plan): dictation laid out before it is pasted. */
 export const SmartFormatting: React.FC<SmartFormattingProps> = React.memo(
   ({ descriptionMode = "tooltip", grouped = false }) => {
     const { t } = useTranslation();

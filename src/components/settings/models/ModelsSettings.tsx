@@ -9,7 +9,7 @@ import { LocalModelCard } from "./LocalModelCard";
 import { useElchiPro } from "@/hooks/useElchiPro";
 
 /**
- * Elchi has two models: Duyu Pro in the cloud (the trial and Elchi Pro) and
+ * Eshlik has two models: Duyu Pro in the cloud (the trial and Eshlik Pro) and
  * Duyu-small on this computer, which is always there as the fallback. The
  * page title and summary come from the settings shell; this is the body.
  */

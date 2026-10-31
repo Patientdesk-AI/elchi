@@ -1,4 +1,4 @@
-//! Portable mode support for Elchi.
+//! Portable mode support for Eshlik.
 //!
 //! When a file named `portable` exists next to the executable, all user data
 //! (settings, models, recordings, database, logs) is stored in a `Data/`
@@ -115,7 +115,9 @@ pub fn store_path(relative: &str) -> PathBuf {
 }
 
 /// Check if a marker file path contains the portable magic string.
-/// Extracted for testability.
+/// Extracted for testability. The string keeps the app's old name: portable
+/// installs from before the rename to Eshlik carry it, and the installer
+/// (nsis/installer.nsi) still writes it, so it is a format, not a label.
 fn is_valid_portable_marker(path: &std::path::Path) -> bool {
     std::fs::read_to_string(path)
         .map(|s| s.trim().starts_with("Elchi Portable Mode"))

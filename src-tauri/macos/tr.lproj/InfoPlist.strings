@@ -1,4 +1,4 @@
 /* Microphone permission prompt */
-"NSMicrophoneUsageDescription" = "Elchi, konuşmanızı yazıya dökmek için mikrofonu kullanır.";
+"NSMicrophoneUsageDescription" = "Eshlik, konuşmanızı yazıya dökmek için mikrofonu kullanır.";
 /* System audio permission prompt (meeting notes) */
-"NSAudioCaptureUsageDescription" = "Elchi, toplantı notları için görüşmedeki diğer kişilerin sesini kaydeder.";
+"NSAudioCaptureUsageDescription" = "Eshlik, toplantı notları için görüşmedeki diğer kişilerin sesini kaydeder.";

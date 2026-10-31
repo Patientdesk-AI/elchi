@@ -360,7 +360,7 @@ pub(crate) async fn process_transcription_output(
     let mut post_processed_text: Option<String> = None;
     let mut post_process_prompt: Option<String> = None;
 
-    // Elchi's formatter first, on every plan unless it is turned off; a custom
+    // Eshlik's formatter first, on every plan unless it is turned off; a custom
     // post-processing prompt, when one is used, works on its result.
     if !final_text.trim().is_empty() {
         let token = app
@@ -832,7 +832,7 @@ impl ShortcutAction for TranscribeAction {
 
                             error!("Transcription failed: {}", err);
                             // Surface the failure to the UI (toast). The full
-                            // message is also in elchi.log via the line above.
+                            // message is also in eshlik.log via the line above.
                             let _ = ah.emit("transcription-error", err.to_string());
                             // Save entry with empty text so user can retry
                             if wav_saved {
