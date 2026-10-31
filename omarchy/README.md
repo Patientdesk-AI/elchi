@@ -55,10 +55,10 @@ elchi-omarchy-setup --key "SUPER + ALT + V" --mode toggle
 | Piece     | How                                                                                   |
 | --------- | ------------------------------------------------------------------------------------- |
 | Hotkey    | Hyprland bind → `elchi --toggle-transcription` (in-app global shortcuts are X11-only) |
-| Typing    | `wtype` (Eshlik picks it on Wayland); `wl-copy` for clipboard pastes                   |
-| Overlay   | Eshlik's recording pill via GTK layer shell, on the monitor under the cursor           |
-| Tray      | `omarchy.tray` shows Eshlik's icon                                                     |
-| Autostart | Eshlik's own XDG autostart entry; uwsm runs `xdg-desktop-autostart.target`             |
+| Typing    | `wtype` (Eshlik picks it on Wayland); `wl-copy` for clipboard pastes                  |
+| Overlay   | Eshlik's recording pill via GTK layer shell, on the monitor under the cursor          |
+| Tray      | `omarchy.tray` shows Eshlik's icon                                                    |
+| Autostart | Eshlik's own XDG autostart entry; uwsm runs `xdg-desktop-autostart.target`            |
 | Updates   | pacman. `/usr/lib/environment.d/50-elchi.conf` sets `HANDY_DISABLE_UPDATER=1`         |
 
 ## Releasing a new version (maintainer)
