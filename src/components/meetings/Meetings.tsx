@@ -401,7 +401,7 @@ const TranscriptLines: React.FC<{ segments: Segment[] }> = ({ segments }) => {
   );
 };
 
-/** The notes, the notebook way: the user's own lines as headings, Elchi's additions under
+/** The notes, the notebook way: the user's own lines as headings, Eshlik's additions under
  *  them in its quieter ink, then the to-dos to tick. */
 const Notes: React.FC<{
   sections: Section[];

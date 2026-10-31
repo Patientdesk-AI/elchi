@@ -18,7 +18,7 @@
     "about": "Hakkında",
     "label": "Bölümler",
     "dictionary": "Sözlük",
-    "back": "ELCHI",
+    "back": "ESHLIK",
     "hints": {
       "general": "G",
       "models": "M",
@@ -122,7 +122,7 @@
       "selectModel": "Model seçilemedi."
     },
     "permissions": {
-      "description": "Elchi'nin sizi duyabilmesi ve metni imlecin olduğu yere yazabilmesi için.",
+      "description": "Eshlik'in sizi duyabilmesi ve metni imlecin olduğu yere yazabilmesi için.",
       "microphone": {
         "title": "Mikrofon",
         "description": "Konuşmanızı yazıya dökebilmek için."
@@ -141,19 +141,19 @@
       },
       "title_one": "Başlamadan önce bir izin.",
       "title_other": "Başlamadan önce iki izin.",
-      "descriptionMicrophone": "Elchi'nin sizi duyabilmesi için.",
+      "descriptionMicrophone": "Eshlik'in sizi duyabilmesi için.",
       "openSettings": "Ayarları aç",
       "note": "Sistem ayarları açılacak",
       "noteWindows": "Windows ayarları açılacak",
       "progress": "{{granted}} / {{total}} izin verildi",
       "stuck": {
         "title": "İzin gelmiyor mu?",
-        "body": "Elchi Sistem Ayarları'nda zaten açık görünüyorsa, macOS önceki bir sürümden kalan eski bir kaydı tutuyor olabilir. Buradan izinleri sıfırlayın, sonra yeniden izin verin. Hâlâ bekliyorsa Elchi'yi yeniden başlatın.",
-        "bodyRestart": "İzin Ayarlar'da açık ama burada onaylanmıyorsa Elchi'yi yeniden başlatın.",
+        "body": "Eshlik Sistem Ayarları'nda zaten açık görünüyorsa, macOS önceki bir sürümden kalan eski bir kaydı tutuyor olabilir. Buradan izinleri sıfırlayın, sonra yeniden izin verin. Hâlâ bekliyorsa Eshlik'i yeniden başlatın.",
+        "bodyRestart": "İzin Ayarlar'da açık ama burada onaylanmıyorsa Eshlik'i yeniden başlatın.",
         "reset": "İzinleri sıfırla",
-        "restart": "Elchi'yi yeniden başlat",
+        "restart": "Eshlik'i yeniden başlat",
         "resetDone": "İzinler sıfırlandı. Şimdi yeniden izin verin.",
-        "resetFailed": "İzinler sıfırlanamadı. Elchi'yi yeniden başlatıp tekrar deneyin."
+        "resetFailed": "İzinler sıfırlanamadı. Eshlik'i yeniden başlatıp tekrar deneyin."
       }
     },
     "tour": {
@@ -161,9 +161,9 @@
       "back": "Geri",
       "next": "Devam",
       "skip": "Şimdilik atla",
-      "start": "Elchi'yi kullanmaya başla",
+      "start": "Eshlik'i kullanmaya başla",
       "welcome": {
-        "title": "Konuşun, Elchi yazsın.",
+        "title": "Konuşun, Eshlik yazsın.",
         "lede": "Metin imlecin olduğu yere gelir — e-posta, belge, sohbet. Çoğu zaman klavyeden hızlı.",
         "anywhere": {
           "title": "Her uygulamada",
@@ -187,7 +187,7 @@
         },
         "free": {
           "title": "Duyu-small ile ücretsiz",
-          "body": "Elchi bu bilgisayarda Duyu-small ile ücretsiz çalışır; isterseniz Pro'ya geçersiniz."
+          "body": "Eshlik bu bilgisayarda Duyu-small ile ücretsiz çalışır; isterseniz Pro'ya geçersiniz."
         }
       },
       "how": {
@@ -205,7 +205,7 @@
         "title": "Bir deneyin.",
         "instructionHold": "Kısayolu basılı tutun, cümleyi okuyun, bırakın.",
         "instructionToggle": "Kısayola basın, cümleyi okuyun, yeniden basın.",
-        "phrase": "Merhaba Elchi, yarınki meeting'i saat üçe alalım ve notları herkesle paylaşalım.",
+        "phrase": "Merhaba Eshlik, yarınki meeting'i saat üçe alalım ve notları herkesle paylaşalım.",
         "boxLabel": "Metin buraya gelecek",
         "placeholder": "İmleç burada; konuşmanız buraya yazılacak.",
         "successTitle": "İşte bu kadar.",
@@ -292,15 +292,15 @@
         "trialDays_one": "Deneme {{count}} gün",
         "trialDays_other": "Deneme {{count}} gün",
         "trialEnded": "Deneme bitti",
-        "proPlan": "ELCHI PRO",
+        "proPlan": "ESHLIK PRO",
         "headline": "En isabetli modelimiz. Hızlı konuşmada, isimlerde ve sayılarda daha az hata.",
-        "freeNote": "Elchi şimdi bu bilgisayarda Duyu-small ile çalışıyor.",
+        "freeNote": "Eshlik şimdi bu bilgisayarda Duyu-small ile çalışıyor.",
         "cta": "Pro'ya geç",
         "price": "{{price}} / ay",
         "freeMonths_one": "İlk ay ücretsiz",
         "freeMonths_other": "İlk {{count}} ay ücretsiz",
-        "active": "ELCHI PRO etkin",
-        "activeUntil": "ELCHI PRO etkin · {{date}} tarihine kadar",
+        "active": "ESHLIK PRO etkin",
+        "activeUntil": "ESHLIK PRO etkin · {{date}} tarihine kadar",
         "useCloudOff": "Kapalıyken Duyu-small"
       },
       "local": {
@@ -323,7 +323,7 @@
     },
     "general": {
       "shortcut": {
-        "title": "Elchi kısayolları",
+        "title": "Eshlik kısayolları",
         "description": "Dikteyi başlatan klavye kısayollarını ayarlayın",
         "external": "Masaüstünüz ayarladı (Hyprland, elchi-omarchy-setup ile). Değiştirmek için terminalde: elchi-omarchy-setup --key …",
         "loading": "Kısayollar yükleniyor...",
@@ -454,11 +454,11 @@
       },
       "autostart": {
         "label": "Oturum açılınca başlat",
-        "description": "Bilgisayarınızda oturum açtığınızda Elchi kendiliğinden başlar."
+        "description": "Bilgisayarınızda oturum açtığınızda Eshlik kendiliğinden başlar."
       },
       "showTrayIcon": {
         "label": "Tepsi simgesini göster",
-        "description": "Elchi simgesini sistem tepsisinde gösterir."
+        "description": "Eshlik simgesini sistem tepsisinde gösterir."
       },
       "overlay": {
         "style": {
@@ -585,11 +585,11 @@
       },
       "showInDock": {
         "label": "Dock'ta göster",
-        "description": "Pencere kapalıyken de Elchi Dock'ta kalır; tıklayınca geri gelir. Kapalıysa Elchi yalnızca menü çubuğunda olur."
+        "description": "Pencere kapalıyken de Eshlik Dock'ta kalır; tıklayınca geri gelir. Kapalıysa Eshlik yalnızca menü çubuğunda olur."
       },
       "meetingDetection": {
         "label": "Görüşmelerde not almayı öner",
-        "description": "Zoom, Teams, Google Meet ya da başka bir görüşme mikrofonunu kullanmaya başlayınca Elchi not almayı önerir; görüşme bitince durdurmayı sorar."
+        "description": "Zoom, Teams, Google Meet ya da başka bir görüşme mikrofonunu kullanmaya başlayınca Eshlik not almayı önerir; görüşme bitince durdurmayı sorar."
       },
       "meetingKeepRecording": {
         "label": "Toplantı kayıtlarını sakla",
@@ -681,7 +681,7 @@
       },
       "updateChecks": {
         "label": "Güncellemeleri denetle",
-        "description": "Elchi'nin yeni sürümlerini otomatik olarak denetler",
+        "description": "Eshlik'in yeni sürümlerini otomatik olarak denetler",
         "lockedDescription": "Sistem yapılandırmasıyla kapatıldı (HANDY_DISABLE_UPDATER)"
       },
       "soundTheme": {
@@ -759,7 +759,7 @@
       },
       "keyboardDiagnostic": {
         "title": "Klavye tanılaması",
-        "description": "Klavye olaylarının Elchi'ye ulaşıp ulaşmadığını denetler. Yalnızca olay sayıları kaydedilir; hangi tuşlara bastığınız kaydedilmez.",
+        "description": "Klavye olaylarının Eshlik'e ulaşıp ulaşmadığını denetler. Yalnızca olay sayıları kaydedilir; hangi tuşlara bastığınız kaydedilmez.",
         "run": "10 saniyelik tanılamayı başlat",
         "running": "Dinleniyor… Kısayolunuza birkaç kez basın (ör. Option+Space)",
         "secureInputLabel": "Güvenli Klavye Girişi",
@@ -773,7 +773,7 @@
         "mouse": "Fare",
         "verdictBlocked": "Güvenli Klavye Girişi tuş olaylarını engelliyor. Bu sorun çözülene kadar normal tuş içeren kısayollar çalışmaz.",
         "verdictSuspicious": "Değiştirici tuş olayları geldi ama hiç tuş olayı gelmedi. Güvenli Klavye Girişi kapalı görünse de bir şey tuşları engelliyor. Lütfen bunu GitHub'da bildirin.",
-        "verdictOk": "Tuş olayları Elchi'ye sorunsuz ulaşıyor.",
+        "verdictOk": "Tuş olayları Eshlik'e sorunsuz ulaşıyor.",
         "verdictNoEvents": "Hiç olay yakalanmadı. Test sırasında bir tuşa bastınız mı?",
         "failed": "Tanılama başarısız oldu: {{error}}"
       },
@@ -803,18 +803,18 @@
       "title": "Hakkında",
       "version": {
         "title": "Sürüm",
-        "description": "Elchi'nin yüklü sürümü"
+        "description": "Eshlik'in yüklü sürümü"
       },
       "appDataDirectory": {
         "title": "Uygulama veri klasörü",
-        "description": "Elchi'nin verilerini sakladığı konum"
+        "description": "Eshlik'in verilerini sakladığı konum"
       },
       "acknowledgments": {
         "title": "Teşekkürler",
         "handy": {
           "title": "Handy",
-          "description": "Elchi'nin temel aldığı açık kaynaklı dikte uygulaması",
-          "details": "Elchi, CJ Pais ve katkıda bulunanların geliştirdiği, MIT lisansıyla yayımlanan Handy'yi temel alır. Açık kaynak olarak paylaştıkları için teşekkür ederiz.",
+          "description": "Eshlik'in temel aldığı açık kaynaklı dikte uygulaması",
+          "details": "Eshlik, CJ Pais ve katkıda bulunanların geliştirdiği, MIT lisansıyla yayımlanan Handy'yi temel alır. Açık kaynak olarak paylaştıkları için teşekkür ederiz.",
           "button": "GitHub'da görüntüle"
         },
         "ggml": {
@@ -825,7 +825,7 @@
       },
       "whatsNewUpdates": {
         "label": "Yenilikleri göster",
-        "description": "Elchi güncellendikten sonra sürüm notlarını gösterir"
+        "description": "Eshlik güncellendikten sonra sürüm notlarını gösterir"
       },
       "updates": {
         "title": "Güncellemeler"
@@ -854,8 +854,8 @@
     "updateAvailableVersion": "Güncelleme var · <v>v{{version}}</v>",
     "installAndRestart": "Kur ve yeniden başlat",
     "updateCheckFailed": "Güncellemeler denetlenemedi. Bağlantınızı denetleyip yeniden deneyin.",
-    "updateInstallFailed": "Güncelleme kurulamadı. Yeniden deneyin ya da Elchi'nin son sürümünü speech.patientdesk.ai/elchi adresinden indirin.",
-    "updateRelaunchFailed": "Güncelleme kuruldu. Yeni sürümü başlatmak için Elchi'den çıkıp yeniden açın."
+    "updateInstallFailed": "Güncelleme kurulamadı. Yeniden deneyin ya da Eshlik'in son sürümünü speech.patientdesk.ai/elchi adresinden indirin.",
+    "updateRelaunchFailed": "Güncelleme kuruldu. Yeni sürümü başlatmak için Eshlik'ten çıkıp yeniden açın."
   },
   "common": {
     "loading": "Yükleniyor...",
@@ -872,7 +872,7 @@
     "selectOption": "Bir seçenek belirleyin…"
   },
   "accessibility": {
-    "permissionsDescription": "Elchi'nin yazıya döktüğü metni yazabilmesi için Erişilebilirlik izni gerekiyor.",
+    "permissionsDescription": "Eshlik'in yazıya döktüğü metni yazabilmesi için Erişilebilirlik izni gerekiyor.",
     "openSettings": "Sistem Ayarları'nı aç"
   },
   "errors": {
@@ -881,7 +881,7 @@
     "micPermissionDenied": {
       "generic": "İşletim sistemi mikrofon erişimini reddetti. Lütfen sistem ayarlarından mikrofon izni verin.",
       "windows": "Ayarlar → Gizlilik ve güvenlik → Mikrofon bölümünden mikrofon erişimini açın (masaüstü uygulamalarının erişimi dahil).",
-      "macos": "Sistem Ayarları → Gizlilik ve Güvenlik → Mikrofon bölümünden Elchi'ye mikrofon erişimi verin.",
+      "macos": "Sistem Ayarları → Gizlilik ve Güvenlik → Mikrofon bölümünden Eshlik'e mikrofon erişimi verin.",
       "linux": "Sisteminizin ses veya gizlilik ayarlarından mikrofon erişimi verin."
     },
     "noInputDeviceTitle": "Mikrofon bulunamadı",
@@ -895,11 +895,11 @@
   },
   "appLanguage": {
     "title": "Uygulama dili",
-    "description": "Elchi arayüzünün dilini değiştirin"
+    "description": "Eshlik arayüzünün dilini değiştirin"
   },
   "theme": {
     "title": "Uygulama teması",
-    "description": "Elchi'nin görünümünü seçin: sistemle aynı, açık veya koyu",
+    "description": "Eshlik'in görünümünü seçin: sistemle aynı, açık veya koyu",
     "options": {
       "system": "Sistem",
       "light": "Açık",
@@ -919,7 +919,7 @@
     }
   },
   "whatsNew": {
-    "title": "Elchi {{version}} sürümündeki yenilikler"
+    "title": "Eshlik {{version}} sürümündeki yenilikler"
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} uygulaması 1 kısayolu engelliyor olabilir",
@@ -934,7 +934,7 @@
     "label": "Güvenli klavye girişi açık"
   },
   "elchiPro": {
-    "cta": "Elchi Pro'ya geç",
+    "cta": "Eshlik Pro'ya geç",
     "upgradeFailed": "Tarayıcı açılamadı. speech.patientdesk.ai/elchi adresinden devam edebilirsiniz.",
     "card": {
       "eyebrow": "Duyu Pro",
@@ -945,7 +945,7 @@
       "trial_one": "Duyu Pro denemenizin bitmesine {{count}} gün kaldı.",
       "trial_other": "Duyu Pro denemenizin bitmesine {{count}} gün kaldı.",
       "ended": "Duyu Pro denemeniz sona erdi.",
-      "endedDetail": "Elchi artık Duyu-small ile çalışıyor. Elchi Pro'ya geçin: ilk ay ücretsiz, kart bilgisi gerekmez.",
+      "endedDetail": "Eshlik artık Duyu-small ile çalışıyor. Eshlik Pro'ya geçin: ilk ay ücretsiz, kart bilgisi gerekmez.",
       "dismiss": "Kapat"
     },
     "badge": {
@@ -955,9 +955,9 @@
   },
   "dictionary": {
     "title": "Sözlük",
-    "intro": "İsimler, markalar ve terimler. Elchi bunları sizin yazdığınız gibi yazar.",
-    "howMac": "Elchi'nin yazdığı bir kelimeyi düzelttiğinizde (Kan → Kaan) kendiliğinden öğrenir. Geçmiş'te bir dikteyi düzenleyerek de öğretebilirsiniz.",
-    "howOther": "Geçmiş'te bir dikteyi düzelttiğinizde (Kan → Kaan) Elchi yeni isimleri öğrenir. Kelimeleri buradan da ekleyebilirsiniz.",
+    "intro": "İsimler, markalar ve terimler. Eshlik bunları sizin yazdığınız gibi yazar.",
+    "howMac": "Eshlik'in yazdığı bir kelimeyi düzelttiğinizde (Kan → Kaan) kendiliğinden öğrenir. Geçmiş'te bir dikteyi düzenleyerek de öğretebilirsiniz.",
+    "howOther": "Geçmiş'te bir dikteyi düzelttiğinizde (Kan → Kaan) Eshlik yeni isimleri öğrenir. Kelimeleri buradan da ekleyebilirsiniz.",
     "addPlaceholder": "Kelime ekleyin, ör. PatientDesk",
     "add": "Ekle",
     "learned": "öğrenildi",
@@ -969,7 +969,7 @@
     "count_one": "{{count}} kelime",
     "count_other": "{{count}} kelime",
     "phrasesTitle": "Düzeltilen ifadeler",
-    "phrasesHint": "Elchi'nin yanlış duyduğu ve senin düzelttiğin kelime grupları. Aynı hata tekrar olursa biçimlendirme düzeltir.",
+    "phrasesHint": "Eshlik'in yanlış duyduğu ve senin düzelttiğin kelime grupları. Aynı hata tekrar olursa biçimlendirme düzeltir.",
     "heardLabel": "Duyulan",
     "emptyHint": "Henüz kelime yok",
     "example": "Örnek",
@@ -982,7 +982,7 @@
     "engineLocal": "Duyu-small",
     "today": "Bugün",
     "yesterday": "Dün",
-    "fromElchi": "Elchi'den",
+    "fromElchi": "Eshlik'ten",
     "words_one": "{{n}} kelime",
     "words_other": "{{n}} kelime",
     "formatted": "biçimlendirildi",
@@ -1050,7 +1050,7 @@
       "label": "Metni düzelt",
       "save": "Kaydet",
       "cancel": "Vazgeç",
-      "hint": "Düzeltirsen Elchi yeni isimleri öğrenir",
+      "hint": "Düzeltirsen Eshlik yeni isimleri öğrenir",
       "editing": "Düzenleniyor",
       "saved": "Düzeltme kaydedildi"
     },
@@ -1067,7 +1067,7 @@
       "trialText": "Hızlı konuşmada, isimlerde ve sayılarda daha az düzeltme.",
       "freeLabel": "Duyu Pro",
       "freeTitle": "Duyu Pro denemeniz sona erdi.",
-      "freeText": "Elchi artık Duyu-small ile çalışıyor.",
+      "freeText": "Eshlik artık Duyu-small ile çalışıyor.",
       "price": "{{price}} / ay",
       "freeMonths_one": "İlk ay ücretsiz",
       "freeMonths_other": "İlk {{count}} ay ücretsiz",
@@ -1104,7 +1104,7 @@
     "writing": "Notlar yazılıyor…",
     "empty": "Bu toplantıda konuşma duyulmadı.",
     "proOnly": "Toplantı notları Duyu Pro ile yazılır. Döküm burada; Duyu Pro'ya geçince notları da yazabilirim.",
-    "interrupted": "Elchi kapandığı için bu toplantı yarıda kaldı. Döküm burada; notları şimdi yazabilirim.",
+    "interrupted": "Eshlik kapandığı için bu toplantı yarıda kaldı. Döküm burada; notları şimdi yazabilirim.",
     "failed": "Notlar yazılamadı. Döküm burada; tekrar deneyebilirsin.",
     "upgrade": "Duyu Pro'ya geç",
     "retry": "Notları yaz",
@@ -1134,8 +1134,8 @@
     },
     "new": {
       "title": "Yeni toplantı",
-      "body": "Elchi görüşmeyi senin mikrofonundan ve bilgisayarın sesinden dinler; aramaya kimse katılmaz. Bitirince notları senin notlarının etrafında yazarım.",
-      "bodyFree": "Elchi görüşmeyi senin mikrofonundan ve bilgisayarın sesinden dinler; aramaya kimse katılmaz. Döküm ücretsiz; notları Duyu Pro yazar.",
+      "body": "Eshlik görüşmeyi senin mikrofonundan ve bilgisayarın sesinden dinler; aramaya kimse katılmaz. Bitirince notları senin notlarının etrafında yazarım.",
+      "bodyFree": "Eshlik görüşmeyi senin mikrofonundan ve bilgisayarın sesinden dinler; aramaya kimse katılmaz. Döküm ücretsiz; notları Duyu Pro yazar.",
       "start": "Toplantıyı başlat"
     },
     "live": {
@@ -1168,13 +1168,13 @@
     "titlePlaceholder": "Başlıksız toplantı",
     "legend": {
       "mine": "Senin yazdığın",
-      "elchi": "Elchi'nin toplantıdan eklediği"
+      "elchi": "Eshlik'in toplantıdan eklediği"
     },
     "showTranscript_one": "Dökümü göster · {{count}} satır",
     "showTranscript_other": "Dökümü göster · {{count}} satır",
     "hideTranscript": "Dökümü gizle",
     "pill": {
-      "open": "Toplantıyı Elchi'de aç",
+      "open": "Toplantıyı Eshlik'te aç",
       "listening": "Dinleniyor",
       "startTitle": "Toplantıda mısın?",
       "startBody": "{{app}} mikrofonunu kullanıyor.",

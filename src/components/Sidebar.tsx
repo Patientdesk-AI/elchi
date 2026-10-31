@@ -118,7 +118,7 @@ interface SettingsRailProps {
 }
 
 /**
- * The settings left rail (design frames 1c / 3b / 3c): back to Elchi, the four
+ * The settings left rail (design frames 1c / 3b / 3c): back to Eshlik, the four
  * user tabs with their letter shortcuts, the developer area once revealed, and
  * the footer with the engine and the version.
  */

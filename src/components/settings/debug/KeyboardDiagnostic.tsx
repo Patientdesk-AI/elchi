@@ -7,7 +7,7 @@ import { useOsType } from "../../../hooks/useOsType";
  * Count-only keyboard capture test (macOS).
  *
  * Opens a short-lived listener and tallies how many key-down / key-up /
- * modifier / mouse events reach Elchi — never *which* keys were pressed.
+ * modifier / mouse events reach Eshlik — never *which* keys were pressed.
  * The signature of stuck Secure Input (issue #1578) is modifier events
  * flowing while key-down stays at zero.
  */

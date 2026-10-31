@@ -279,7 +279,7 @@ async refreshElchiPro() : Promise<Result<ElchiProStatus, string>> {
 }
 },
 /**
- * Opens the Elchi Pro page in the browser and watches for the activation.
+ * Opens the Eshlik Pro page in the browser and watches for the activation.
  */
 async openElchiUpgrade() : Promise<Result<null, string>> {
     try {
@@ -296,7 +296,7 @@ async setElchiUsePro(enabled: boolean) : Promise<ElchiProStatus> {
     return await TAURI_INVOKE("set_elchi_use_pro", { enabled });
 },
 /**
- * Whether dictated text goes to Elchi's formatter before it is pasted.
+ * Whether dictated text goes to Eshlik's formatter before it is pasted.
  */
 async setElchiFormat(enabled: boolean) : Promise<ElchiProStatus> {
     return await TAURI_INVOKE("set_elchi_format", { enabled });
@@ -633,7 +633,7 @@ async triggerUpdateCheck() : Promise<Result<null, string>> {
 }
 },
 /**
- * Called by the settings window once its startup checks are done: when Elchi
+ * Called by the settings window once its startup checks are done: when Eshlik
  * started hidden and nothing needed the user (permissions, onboarding), the
  * still-hidden window is freed until it is opened from the tray (#9).
  */
@@ -819,7 +819,7 @@ async setActiveModel(modelId: string) : Promise<Result<null, string>> {
 }
 },
 /**
- * Ends first-run onboarding without a model step: Elchi has one local model.
+ * Ends first-run onboarding without a model step: Eshlik has one local model.
  * If Duyu-small is on disk it is selected now; otherwise it downloads in the
  * background and is selected when it lands (dictation meanwhile goes to Duyu
  * Pro during the trial).
@@ -896,7 +896,7 @@ async openMicrophonePrivacySettings() : Promise<Result<null, string>> {
 }
 },
 /**
- * Clears Elchi's own entries in macOS's privacy settings (Accessibility,
+ * Clears Eshlik's own entries in macOS's privacy settings (Accessibility,
  * Microphone), so asking again adds fresh ones. An entry left by an earlier,
  * differently signed build shows as on in System Settings while macOS still
  * refuses it, and nothing the user toggles there helps.
@@ -1001,7 +1001,7 @@ async setMeetingNotes(id: number, notes: string) : Promise<Result<null, string>>
 }
 },
 /**
- * The pill was clicked: Elchi's window, on the meeting.
+ * The pill was clicked: Eshlik's window, on the meeting.
  */
 async openMeetingFromPill() : Promise<void> {
     await TAURI_INVOKE("open_meeting_from_pill");
@@ -1070,7 +1070,7 @@ async changeMeetingDetectionSetting(enabled: boolean) : Promise<Result<null, str
 },
 /**
  * The prompt's "Take notes". The first meeting shows the recording disclosure first, in
- * Elchi's window.
+ * Eshlik's window.
  */
 async meetingPromptStart() : Promise<Result<null, string>> {
     try {
@@ -1351,7 +1351,7 @@ whats_new_last_seen_version?: string; selected_model?: string; onboarding_comple
 selected_channel?: number | null; clamshell_microphone?: string | null; selected_output_device?: string | null; translate_to_english?: boolean; selected_language?: string; overlay_position?: OverlayPosition; debug_mode?: boolean; log_level?: LogLevel; custom_words?: string[]; model_unload_timeout?: ModelUnloadTimeout; word_correction_threshold?: number; history_limit?: number; recording_retention_period?: RecordingRetentionPeriod; paste_method?: PasteMethod; clipboard_handling?: ClipboardHandling; auto_submit?: boolean; auto_submit_key?: AutoSubmitKey; post_process_enabled?: boolean; post_process_provider_id?: string; post_process_providers?: PostProcessProvider[]; post_process_api_keys?: SecretMap; 
 /**
  * Use Duyu Pro (the cloud model) whenever the plan includes it: the
- * first 7 days, and for Elchi Pro subscribers. See crate::elchi_pro.
+ * first 7 days, and for Eshlik Pro subscribers. See crate::elchi_pro.
  */
 elchi_use_pro?: boolean; 
 /**
@@ -1363,7 +1363,7 @@ elchi_session?: ElchiSession | null;
  */
 elchi_trial_end_seen?: boolean; 
 /**
- * Lay dictated text out before pasting it (Elchi's formatter on our
+ * Lay dictated text out before pasting it (Eshlik's formatter on our
  * servers; see crate::elchi_pro). On by default, on every plan.
  */
 elchi_format?: boolean; 
@@ -1378,7 +1378,7 @@ elchi_dictionary?: DictionaryWord[];
 elchi_dictionary_learn?: boolean; post_process_models?: Partial<{ [key in string]: string }>; post_process_prompts?: LLMPrompt[]; post_process_selected_prompt_id?: string | null; mute_while_recording?: boolean; append_trailing_space?: boolean; app_language?: string; theme?: Theme; experimental_enabled?: boolean; lazy_stream_close?: boolean; keyboard_implementation?: KeyboardImplementation; show_tray_icon?: boolean; 
 /**
  * macOS: keep the Dock icon while the settings window is closed, so the
- * Dock brings Elchi back. Off, Elchi lives only in the menu bar then.
+ * Dock brings Eshlik back. Off, Eshlik lives only in the menu bar then.
  */
 show_in_dock?: boolean; 
 /**
@@ -1429,7 +1429,7 @@ overlay_style?: OverlayStyle;
  */
 overlay_idle_line?: boolean; 
 /**
- * Label of a dictation key owned by the desktop rather than by Elchi
+ * Label of a dictation key owned by the desktop rather than by Eshlik
  * (Hyprland binds written by `elchi-omarchy-setup`). Shown in place of
  * the in-app shortcut, which cannot capture keys on Wayland.
  */
@@ -1477,7 +1477,7 @@ export type DictionaryWord = {
  */
 word: string; 
 /**
- * How Elchi wrote it before it was corrected: "Kan".
+ * How Eshlik wrote it before it was corrected: "Kan".
  */
 heard?: string[]; 
 /**
@@ -1527,7 +1527,7 @@ export type EngineType =
  */
 "TranscribeCpp" | "Parakeet" | "Moonshine" | "MoonshineStreaming" | "SenseVoice" | "GigaAM" | "Canary" | "Cohere" | 
 /**
- * Duyu-small, Elchi's Turkish + English recognizer (crate::duyu).
+ * Duyu-small, Eshlik's Turkish + English recognizer (crate::duyu).
  */
 "Duyu"
 export type GpuDeviceOption = { id: string; name: string; total_vram_mb: number }
@@ -1668,7 +1668,7 @@ export type RecordingRetentionPeriod = "never" | "preserve_limit" | "days_3" | "
 export type RemoteFile = { path: string; size_bytes: number; sha256: string }
 export type SecretMap = Partial<{ [key in string]: string }>
 /**
- * A single secret (the Elchi Pro token): serialized as a plain string,
+ * A single secret (the Eshlik Pro token): serialized as a plain string,
  * redacted in Debug output so it never reaches the logs.
  */
 export type SecretString = string
@@ -1763,7 +1763,7 @@ export type StreamTextEvent = { committed: string; tentative: string }
 export type StreamWorkKind = "transcribing" | "polishing"
 /**
  * UI appearance mode. `System` follows the OS `prefers-color-scheme`; `Light`
- * and `Dark` force one of the two palettes Elchi ships.
+ * and `Dark` force one of the two palettes Eshlik ships.
  */
 export type Theme = "system" | "light" | "dark"
 export type TranscribeAcceleratorSetting = "auto" | "cpu" | "gpu"

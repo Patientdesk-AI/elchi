@@ -48,7 +48,7 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
-      # Handy pushed to its own `handy-computer` Cachix cache here. Elchi has no
+      # Handy pushed to its own `handy-computer` Cachix cache here. Eshlik has no
       # binary cache yet, so the Nix build runs uncached.
 
       # Regenerate .nix/bun.nix from bun.lock and check if it matches

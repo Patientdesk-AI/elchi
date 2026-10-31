@@ -31,7 +31,7 @@ static MIGRATIONS: &[M] = &[
     M::up("ALTER TABLE transcription_history ADD COLUMN post_processed_text TEXT;"),
     M::up("ALTER TABLE transcription_history ADD COLUMN post_process_prompt TEXT;"),
     M::up("ALTER TABLE transcription_history ADD COLUMN post_process_requested BOOLEAN NOT NULL DEFAULT 0;"),
-    // Elchi's word counts per day (managers/stats.rs).
+    // Eshlik's word counts per day (managers/stats.rs).
     M::up(
         "CREATE TABLE IF NOT EXISTS daily_stats (
             day TEXT PRIMARY KEY,

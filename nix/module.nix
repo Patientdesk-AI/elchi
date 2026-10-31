@@ -1,4 +1,4 @@
-# NixOS module for Elchi speech-to-text
+# NixOS module for Eshlik speech-to-text
 #
 # Handles system-level configuration that the package wrapper cannot:
 #   - udev rule for /dev/uinput (rdev grab() needs it for virtual input)
@@ -26,12 +26,12 @@ let
 in
 {
   options.programs.elchi = {
-    enable = lib.mkEnableOption "Elchi offline speech-to-text";
+    enable = lib.mkEnableOption "Eshlik offline speech-to-text";
 
     package = lib.mkOption {
       type = lib.types.package;
       defaultText = lib.literalExpression "elchi.packages.\${system}.elchi";
-      description = "The Elchi package to use.";
+      description = "The Eshlik package to use.";
     };
   };
 

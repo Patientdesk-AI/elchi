@@ -22,7 +22,7 @@ import type { ModelInfo } from "@/bindings";
 
 /**
  * Genel (design frame 3b): the shortcut, the microphone and sounds, what
- * happens to the text, and how Elchi looks.
+ * happens to the text, and how Eshlik looks.
  */
 export const GeneralSettings: React.FC = () => {
   const { t } = useTranslation();

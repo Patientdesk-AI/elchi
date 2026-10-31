@@ -1214,7 +1214,7 @@ impl TranscriptionManager {
             );
         }
 
-        // Duyu Pro (the trial, or Elchi Pro) transcribes in the cloud; any
+        // Duyu Pro (the trial, or Eshlik Pro) transcribes in the cloud; any
         // failure falls back to the local model so dictation keeps working.
         let hint = matches!(validated_language.as_str(), "tr" | "en")
             .then_some(validated_language.as_str());

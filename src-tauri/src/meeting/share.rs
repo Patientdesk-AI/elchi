@@ -2,7 +2,7 @@
 //! and its transcript and recording when the user picks them, kept on PatientDesk's
 //! servers until the user stops sharing. Whoever has the link can read, listen and
 //! download. The website's /api/elchi/shares makes the link (Duyu Pro token: the trial
-//! and Elchi Pro only) and hands back a signed URL the recording goes straight to; once
+//! and Eshlik Pro only) and hands back a signed URL the recording goes straight to; once
 //! it is all there, the link starts to work. Stopping takes any plan's token.
 //!
 //! The recording goes up as Opus in WebM, which Chrome, Firefox and Safari play in an

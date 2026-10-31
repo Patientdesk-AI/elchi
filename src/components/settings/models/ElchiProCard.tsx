@@ -8,7 +8,7 @@ import "./models.css";
 /**
  * Duyu Pro, the cloud model, as the page's one total-blue zone: the pixel
  * field on the right fading into flat blue under the text. During the trial
- * and on the free plan it carries the upgrade; with Elchi Pro it shows the
+ * and on the free plan it carries the upgrade; with Eshlik Pro it shows the
  * subscription instead. The "use Duyu Pro" switch sits in a frosted tile at
  * the bottom of the zone whenever the plan includes the cloud.
  */

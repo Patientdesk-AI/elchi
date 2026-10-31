@@ -32,7 +32,7 @@ on:
         required: false
         type: boolean
         default: false
-      # Sign the update bundles with Elchi's updater key. Only Elchi's own release
+      # Sign the update bundles with Eshlik's updater key. Only Eshlik's own release
       # builds set this: a build of someone else's code (a pull request) must never
       # hold the key, since it could sign updates every install accepts.
       updater-signing:
@@ -169,7 +169,7 @@ jobs:
           cache: true
 
       # TODO(elchi): Windows code signing. Handy signed through its own Azure
-      # Trusted Signing account (trusted-signing-cli + signCommand); Elchi has
+      # Trusted Signing account (trusted-signing-cli + signCommand); Eshlik has
       # no Windows signing set up yet, so Windows builds are unsigned.
 
       - name: Prepare Vulkan SDK for Ubuntu 24.04
@@ -392,7 +392,7 @@ jobs:
           # real files and draw ldconfig warnings (issue #1639).
           # deb.files key = destination in package, value = source on disk
           jq --arg so1 "$ORT_DIR/lib/libonnxruntime.so.1" \
-            '.bundle.linux.deb.files["/usr/lib/Elchi/libonnxruntime.so.1"] = $so1' \
+            '.bundle.linux.deb.files["/usr/lib/Eshlik/libonnxruntime.so.1"] = $so1' \
             src-tauri/tauri.conf.json > tmp.json && mv tmp.json src-tauri/tauri.conf.json
 
       # Windows x64 links a BASELINE ONNX Runtime dynamically instead of statically
@@ -520,8 +520,8 @@ jobs:
           APPLE_CERTIFICATE: ${{ inputs.sign-binaries && secrets.APPLE_CERTIFICATE || '' }}
           APPLE_CERTIFICATE_PASSWORD: ${{ inputs.sign-binaries && secrets.APPLE_CERTIFICATE_PASSWORD || '' }}
           APPLE_SIGNING_IDENTITY: ${{ inputs.sign-binaries && env.CERT_ID || '' }}
-          # Elchi's updater key: signs the update bundles (createUpdaterArtifacts),
-          # and only in Elchi's own release builds (updater-signing).
+          # Eshlik's updater key: signs the update bundles (createUpdaterArtifacts),
+          # and only in Eshlik's own release builds (updater-signing).
           TAURI_SIGNING_PRIVATE_KEY: ${{ inputs.updater-signing && secrets.TAURI_SIGNING_PRIVATE_KEY || '' }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ inputs.updater-signing && secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD || '' }}
           # The Vulkan loader and Wayland client library must come from the host
@@ -658,7 +658,7 @@ jobs:
               export VK_ICD_FILENAMES="$vulkan_icd"
             fi
             HANDY_NO_GTK_LAYER_SHELL=1 \
-            LD_LIBRARY_PATH="${root}/usr/lib/Elchi:${root}/usr/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}" \
+            LD_LIBRARY_PATH="${root}/usr/lib/Eshlik:${root}/usr/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}" \
               xvfb-run -a "${root}/usr/bin/elchi" --list-devices \
                 >/tmp/elchi-package-smoke.log 2>&1
             echo "${label} --list-devices smoke passed"
@@ -670,14 +670,14 @@ jobs:
               listing="$(mktemp)"
               dpkg-deb -c "$deb" > "$listing"
               require_pattern "$listing" 'usr/bin/elchi$' "elchi binary"
-              require_pattern "$listing" 'usr/lib/Elchi/libtranscribe\.so(\.[0-9]+)+$' "transcribe runtime library (SONAME)"
-              require_pattern "$listing" 'usr/lib/Elchi/libggml-cpu.*\.so' "ggml CPU backend module"
+              require_pattern "$listing" 'usr/lib/Eshlik/libtranscribe\.so(\.[0-9]+)+$' "transcribe runtime library (SONAME)"
+              require_pattern "$listing" 'usr/lib/Eshlik/libggml-cpu.*\.so' "ggml CPU backend module"
               if [[ "${{ inputs.platform }}" == *"ubuntu-22.04"* && "${{ inputs.target }}" == "x86_64-unknown-linux-gnu" ]]; then
-                require_pattern "$listing" 'usr/lib/Elchi/libonnxruntime\.so\.[0-9]+$' "ONNX Runtime library (SONAME)"
+                require_pattern "$listing" 'usr/lib/Eshlik/libonnxruntime\.so\.[0-9]+$' "ONNX Runtime library (SONAME)"
               fi
               # Handy's libs must stay out of the ldconfig-scanned /usr/lib
-              # (issue #1639): app-private libs belong in /usr/lib/Elchi only.
-              # `[^/]+` excludes the Elchi/ subdir, so only direct hits match.
+              # (issue #1639): app-private libs belong in /usr/lib/Eshlik only.
+              # `[^/]+` excludes the Eshlik/ subdir, so only direct hits match.
               if grep -Eq 'usr/lib/[^/]+\.so' "$listing"; then
                 echo "ERROR: libraries installed directly into /usr/lib (issue #1639):" >&2
                 grep -E 'usr/lib/[^/]+\.so' "$listing" >&2
@@ -700,8 +700,8 @@ jobs:
               listing="$(mktemp)"
               rpm -qpl "$rpm_pkg" > "$listing"
               require_pattern "$listing" '/usr/bin/elchi$' "elchi binary"
-              require_pattern "$listing" '/usr/lib/Elchi/libtranscribe\.so(\.[0-9]+)+$' "transcribe runtime library (SONAME)"
-              require_pattern "$listing" '/usr/lib/Elchi/libggml-cpu.*\.so' "ggml CPU backend module"
+              require_pattern "$listing" '/usr/lib/Eshlik/libtranscribe\.so(\.[0-9]+)+$' "transcribe runtime library (SONAME)"
+              require_pattern "$listing" '/usr/lib/Eshlik/libggml-cpu.*\.so' "ggml CPU backend module"
               # Same /usr/lib pollution guard as the deb audit (issue #1639).
               if grep -Eq 'usr/lib/[^/]+\.so' "$listing"; then
                 echo "ERROR: libraries installed directly into /usr/lib (issue #1639):" >&2
@@ -716,11 +716,11 @@ jobs:
             for appimage in "${BUNDLE_DIR}"/appimage/*.AppImage; do
               echo "Auditing AppImage package: ${appimage}"
               workdir="$(mktemp -d)"
-              cp "$appimage" "${workdir}/Elchi.AppImage"
-              chmod +x "${workdir}/Elchi.AppImage"
+              cp "$appimage" "${workdir}/Eshlik.AppImage"
+              chmod +x "${workdir}/Eshlik.AppImage"
               (
                 cd "$workdir"
-                ./Elchi.AppImage --appimage-extract >/dev/null
+                ./Eshlik.AppImage --appimage-extract >/dev/null
                 require_path "squashfs-root/usr/bin/elchi" "AppImage elchi binary"
                 # Gear Lever and other integration tools consume the root entry;
                 # appimagetool does not update the copy under usr/share/applications.
@@ -872,7 +872,7 @@ jobs:
 
           # Administrative install extracts the MSI payload without elevation.
           $msiPackages = Get-ChildItem (Join-Path $bundleBase "msi") -Filter "*.msi" -ErrorAction SilentlyContinue
-          # Elchi ships the NSIS installer only (`--bundles nsis`); audit MSIs
+          # Eshlik ships the NSIS installer only (`--bundles nsis`); audit MSIs
           # when a build makes them.
           if (-not $msiPackages) {
             Write-Host "No MSI packages under $bundleBase (NSIS-only build); skipping the MSI audit"

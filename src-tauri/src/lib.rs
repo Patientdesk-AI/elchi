@@ -109,13 +109,13 @@ fn build_console_filter() -> env_filter::Filter {
 
 /// Creates the settings window, hidden. It is created at startup and again when
 /// it is opened after being closed: closing it frees its webview (#9), which is
-/// most of what Elchi holds in memory while it waits in the tray.
+/// most of what Eshlik holds in memory while it waits in the tray.
 fn create_main_window(app: &AppHandle) -> tauri::Result<tauri::WebviewWindow> {
     // Created programmatically so we can set data_directory for portable mode
     // (redirects WebView2 cache to portable Data dir).
     let mut win_builder =
         tauri::WebviewWindowBuilder::new(app, "main", tauri::WebviewUrl::App("/".into()))
-            .title("Elchi")
+            .title("Eshlik")
             .inner_size(760.0, 640.0)
             .min_inner_size(680.0, 570.0)
             .resizable(true)
@@ -247,7 +247,7 @@ fn tray_available(app: &AppHandle) -> bool {
     get_settings(app).show_tray_icon && !app.state::<CliArgs>().no_tray
 }
 
-/// macOS: whether Elchi leaves the Dock while its window is closed. Only when
+/// macOS: whether Eshlik leaves the Dock while its window is closed. Only when
 /// the user turned "Show in Dock" off and the menu bar icon can bring it back.
 pub(crate) fn hides_from_dock(app: &AppHandle) -> bool {
     tray_available(app) && !get_settings(app).show_in_dock
@@ -473,7 +473,7 @@ fn initialize_core_logic(app_handle: &AppHandle) {
     }
 }
 
-/// Called by the settings window once its startup checks are done: when Elchi
+/// Called by the settings window once its startup checks are done: when Eshlik
 /// started hidden and nothing needed the user (permissions, onboarding), the
 /// still-hidden window is freed until it is opened from the tray (#9).
 #[tauri::command]
@@ -1013,7 +1013,7 @@ pub fn run(cli_args: CliArgs) {
         builder = builder.plugin(tauri_nspanel::init());
     }
 
-    // Single-instance forwards CLI args to an already-running Elchi and exits.
+    // Single-instance forwards CLI args to an already-running Eshlik and exits.
     // That would make the headless path
     // (--transcribe-file/--list-devices/--list-models) a silent no-op whenever the
     // app is already open, so skip it in headless mode and run a standalone
@@ -1226,7 +1226,7 @@ pub fn run(cli_args: CliArgs) {
     // `app` is only used by the macOS arm.
     #[cfg_attr(not(target_os = "macos"), allow(unused_variables))]
     app.run(|app, event| match &event {
-        // The settings window is freed when closed (#9), and Elchi lives on in
+        // The settings window is freed when closed (#9), and Eshlik lives on in
         // the tray: only an explicit quit (which carries an exit code) ends it.
         tauri::RunEvent::ExitRequested {
             code: None, api, ..

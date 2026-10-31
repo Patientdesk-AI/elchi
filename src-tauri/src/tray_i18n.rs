@@ -23,7 +23,7 @@ include!(concat!(env!("OUT_DIR"), "/tray_translations.rs"));
 /// Get localized tray menu strings based on the system locale.
 ///
 /// Lookup order: exact locale → Chinese script/region fallback → language code
-/// → Turkish (Elchi's default) → English.
+/// → Turkish (Eshlik's default) → English.
 pub fn get_tray_translations(locale: Option<String>) -> TrayStrings {
     let normalized = locale
         .as_deref()
@@ -55,7 +55,7 @@ mod tests {
 
     #[test]
     fn resolves_locale_fallbacks() {
-        // Elchi ships Turkish and English; anything else is Turkish.
+        // Eshlik ships Turkish and English; anything else is Turkish.
         for (locale, expected) in [
             ("tr", "tr"),
             ("tr-TR", "tr"),

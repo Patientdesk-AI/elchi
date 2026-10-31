@@ -11,7 +11,7 @@ import { SELF_UPDATE_AVAILABLE } from "../../../lib/constants/updater";
 
 /**
  * Hakkında: opened from the version line in the rail. The version and the
- * update controls, release notes, logs, and the projects Elchi builds on.
+ * update controls, release notes, logs, and the projects Eshlik builds on.
  */
 export const AboutSettings: React.FC = () => {
   const { t } = useTranslation();

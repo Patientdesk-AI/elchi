@@ -1,4 +1,4 @@
-; Custom NSIS template for Elchi with portable mode support.
+; Custom NSIS template for Eshlik with portable mode support.
 ; Based on tauri-apps/tauri@tauri-v2.9.1 crates/tauri-bundler/src/bundle/windows/nsis/installer.nsi
 ; Portable changes are marked with "; --- PORTABLE MODE ---" comments.
 ;
@@ -65,6 +65,11 @@ ${StrLoc}
 !define UNINSTKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCTNAME}"
 !define MANUKEY "Software\${MANUFACTURER}"
 !define MANUPRODUCTKEY "${MANUKEY}\${PRODUCTNAME}"
+; The app was called Elchi up to 1.0.8. Its installs are found by the old name's
+; keys: updated in their folder, shortcuts carried over, and listed once in Apps.
+!define LEGACYPRODUCTNAME "Elchi"
+!define LEGACYUNINSTKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${LEGACYPRODUCTNAME}"
+!define LEGACYMANUPRODUCTKEY "${MANUKEY}\${LEGACYPRODUCTNAME}"
 !define UNINSTALLERSIGNCOMMAND "{{uninstaller_sign_cmd}}"
 !define ESTIMATEDSIZE "{{estimated_size}}"
 !define STARTMENUFOLDER "{{start_menu_folder}}"
@@ -217,7 +222,7 @@ Function PageLeaveInstallType
   ${NSD_GetState} $InstallTypeRadioPortable $0
   ${If} $0 = ${BST_CHECKED}
     StrCpy $PortableMode 1
-    ; --- PORTABLE MODE --- Switch default directory to Desktop\Elchi for portable
+    ; --- PORTABLE MODE --- Switch default directory to Desktop\Eshlik for portable
     ${If} $INSTDIR == "${PLACEHOLDER_INSTALL_DIR}"
     ${OrIf} $INSTDIR == "$LOCALAPPDATA\${PRODUCTNAME}"
       StrCpy $INSTDIR "$DESKTOP\${PRODUCTNAME}"
@@ -819,6 +824,20 @@ Section Install
       WriteRegStr SHCTX "${UNINSTKEY}" "HelpLink" "${HOMEPAGE}"
     !endif
 
+    ; Installed over an Elchi install: rename its shortcuts (an update creates
+    ; none of its own) and drop its old-name keys, so Apps lists the app once.
+    ReadRegStr $R0 SHCTX "${LEGACYUNINSTKEY}" "UninstallString"
+    ${If} $R0 != ""
+      ${If} ${FileExists} "$SMPROGRAMS\${LEGACYPRODUCTNAME}.lnk"
+        Rename "$SMPROGRAMS\${LEGACYPRODUCTNAME}.lnk" "$SMPROGRAMS\${PRODUCTNAME}.lnk"
+      ${EndIf}
+      ${If} ${FileExists} "$DESKTOP\${LEGACYPRODUCTNAME}.lnk"
+        Rename "$DESKTOP\${LEGACYPRODUCTNAME}.lnk" "$DESKTOP\${PRODUCTNAME}.lnk"
+      ${EndIf}
+      DeleteRegKey SHCTX "${LEGACYUNINSTKEY}"
+      DeleteRegKey SHCTX "${LEGACYMANUPRODUCTKEY}"
+    ${EndIf}
+
     ; Create start menu shortcut
     !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
       Call CreateOrUpdateStartMenuShortcut
@@ -998,6 +1017,9 @@ SectionEnd
 
 Function RestorePreviousInstallLocation
   ReadRegStr $4 SHCTX "${MANUPRODUCTKEY}" ""
+  ; Nothing under the current name: look for an install from when it was Elchi.
+  StrCmp $4 "" 0 +2
+    ReadRegStr $4 SHCTX "${LEGACYMANUPRODUCTKEY}" ""
   StrCmp $4 "" +2 0
     StrCpy $INSTDIR $4
 FunctionEnd

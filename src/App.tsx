@@ -71,7 +71,7 @@ function App() {
   const [isReturningUser, setIsReturningUser] = useState(false);
   const [currentSection, setCurrentSection] =
     useState<SidebarSection>("general");
-  // Elchi opens on its home feed; the gear there opens these settings.
+  // Eshlik opens on its home feed; the gear there opens these settings.
   const [view, setView] = useState<"home" | "settings" | "meetings">("home");
   const osType = useOsType();
   const openSettings = (section?: SidebarSection) => {
@@ -79,7 +79,7 @@ function App() {
     setView("settings");
   };
 
-  // The meeting pill was clicked: Elchi opens on the meeting.
+  // The meeting pill was clicked: Eshlik opens on the meeting.
   useEffect(() => {
     const un = listen("open-meetings", () => setView("meetings"));
     return () => {
@@ -331,7 +331,7 @@ function App() {
   };
 
   const handleAccessibilityComplete = async () => {
-    // Elchi has one local model, so there is no model step: the backend
+    // Eshlik has one local model, so there is no model step: the backend
     // selects Duyu-small, or downloads it in the background while the Duyu Pro
     // trial transcribes.
     if (!isReturningUser) {
@@ -339,7 +339,7 @@ function App() {
       if (result.status === "error") {
         console.error("Failed to finish onboarding:", result.error);
       }
-      // New users get the tour: what Elchi does, how to use it, a try.
+      // New users get the tour: what Eshlik does, how to use it, a try.
       setOnboardingStep("welcome");
       return;
     }

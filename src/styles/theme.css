@@ -1,4 +1,4 @@
-/* Elchi colors: obsidian + electric blue.
+/* Eshlik colors: obsidian + electric blue.
  *
  * Dark, "Obsidian" (the primary look): a near-black ground, graphite "steel"
  * chrome lit from above, and one accent, electric blue #2140FF. The blue is
@@ -130,7 +130,7 @@
  * Explicit theme override, driven by the `theme` setting via
  * `document.documentElement.dataset.theme`. When set, the higher-specificity
  * attribute selectors win over the `prefers-color-scheme` media query above,
- * so a user can keep Elchi light or dark regardless of the OS setting.
+ * so a user can keep Eshlik light or dark regardless of the OS setting.
  * `system` (or no attribute) leaves the OS in charge.
  *
  * Lives here (not in App.css) so every window that imports the shared palette —

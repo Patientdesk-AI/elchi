@@ -360,7 +360,7 @@ pub(crate) async fn process_transcription_output(
     let mut post_processed_text: Option<String> = None;
     let mut post_process_prompt: Option<String> = None;
 
-    // Elchi's formatter first, on every plan unless it is turned off; a custom
+    // Eshlik's formatter first, on every plan unless it is turned off; a custom
     // post-processing prompt, when one is used, works on its result.
     if !final_text.trim().is_empty() {
         let token = app

@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from "react";
 
 /**
- * Elchi's brand visual: a pixel field rendered on a canvas in 3-4px cells,
- * ported from the Claude Design "Elchi Redesign" file.
+ * Eshlik's brand visual: a pixel field rendered on a canvas in 3-4px cells,
+ * ported from the Claude Design "Eshlik Redesign" file.
  *
  *  - `spec`  a spectrogram on near-black (the home hero, empty states).
  *            Pass `energy` to shape it from real data (e.g. words per day).

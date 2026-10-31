@@ -1,4 +1,4 @@
-//! How much Elchi has written for its user: words and dictations per day, and the
+//! How much Eshlik has written for its user: words and dictations per day, and the
 //! time that saved them. Kept in the history database (table `daily_stats`, created
 //! by a migration in managers/history.rs), one row per local day, so the totals
 //! survive history being trimmed or turned off.

@@ -135,7 +135,7 @@ pub fn get_windows_microphone_permission_status() -> WindowsMicrophonePermission
     }
 }
 
-/// Clears Elchi's own entries in macOS's privacy settings (Accessibility,
+/// Clears Eshlik's own entries in macOS's privacy settings (Accessibility,
 /// Microphone), so asking again adds fresh ones. An entry left by an earlier,
 /// differently signed build shows as on in System Settings while macOS still
 /// refuses it, and nothing the user toggles there helps.

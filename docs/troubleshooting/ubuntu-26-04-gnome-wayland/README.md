@@ -1,6 +1,6 @@
-# Elchi on Ubuntu 26.04 GNOME Wayland
+# Eshlik on Ubuntu 26.04 GNOME Wayland
 
-Tested on Ubuntu 26.04.1 LTS, GNOME Wayland, Handy 0.9.8 (the release Elchi is forked from).
+Tested on Ubuntu 26.04.1 LTS, GNOME Wayland, Handy 0.9.8 (the release Eshlik is forked from).
 
 The fix is to use `ydotool` for typing and `handy_keys` for shortcuts.
 
@@ -36,30 +36,30 @@ ydotool type "HELLO FROM YDOTOOL"
 
 The service should show `active (running)` and the test should type into the focused application.
 
-## 3. Configure Elchi
+## 3. Configure Eshlik
 
-Edit Elchi's settings with:
+Edit Eshlik's settings with:
 
 ```bash
 sed -i 's/"typing_tool": "auto"/"typing_tool": "ydotool"/' ~/.local/share/com.elchi.app/settings_store.json
 sed -i 's/"keyboard_implementation": "tauri"/"keyboard_implementation": "handy_keys"/' ~/.local/share/com.elchi.app/settings_store.json
 ```
 
-Restart Elchi:
+Restart Eshlik:
 
 ```bash
 pkill elchi
 elchi --start-hidden &
 ```
 
-Check the Elchi log for:
+Check the Eshlik log for:
 
 ```text
 handy-keys manager thread started
 handy-keys shortcuts initialized
 ```
 
-Then use your existing Elchi shortcut and test dictation.
+Then use your existing Eshlik shortcut and test dictation.
 
 ## 4. Hide the overlay
 
@@ -67,7 +67,7 @@ On GNOME, the overlay is a regular window that can take the focus, so nothing is
 
 ## 5. Install wl-clipboard
 
-Elchi uses `wl-copy` on Wayland when it is installed:
+Eshlik uses `wl-copy` on Wayland when it is installed:
 
 ```bash
 sudo apt install wl-clipboard

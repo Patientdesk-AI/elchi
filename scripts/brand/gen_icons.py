@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate Elchi's icon artwork (app icon master + tray glyphs) as SVG.
+"""Generate Eshlik's icon artwork (app icon master + tray glyphs) as SVG.
 
 The motif is the eight-point star of Turkish tile work (Akdeniz / Çini): a
 16-point star in a 100-unit box with a round eye.
@@ -43,7 +43,7 @@ def app_icon():
             cx, cy = 100 + col * 112 + (56 if row % 2 else 0), 100 + row * 112
             tile.append(f'<path d="{star_path(cx, cy, 72)}"/>')
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
-  <title>Elchi</title>
+  <title>Eshlik</title>
   <defs><clipPath id="sq"><rect x="100" y="100" width="824" height="824" rx="186"/></clipPath></defs>
   <g clip-path="url(#sq)">
     <rect x="100" y="100" width="824" height="824" fill="{TEAL}"/>

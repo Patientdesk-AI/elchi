@@ -2,7 +2,7 @@
 //!
 //! A meeting's status: `recording`, then `processing` while its notes are written, then
 //! `done` (notes written), `no_notes` (no Duyu Pro, or the notes failed: the transcript is
-//! kept instead), `empty` (nobody spoke) or `interrupted` (Elchi quit mid-meeting).
+//! kept instead), `empty` (nobody spoke) or `interrupted` (Eshlik quit mid-meeting).
 
 use rusqlite::{params, Connection, OptionalExtension};
 use serde::{Deserialize, Serialize};
@@ -206,7 +206,7 @@ pub fn delete(conn: &Connection, id: i64) -> rusqlite::Result<()> {
     Ok(())
 }
 
-/// Meetings Elchi was recording or writing up when it quit: their transcript stays.
+/// Meetings Eshlik was recording or writing up when it quit: their transcript stays.
 pub fn mark_interrupted(conn: &Connection) -> rusqlite::Result<usize> {
     conn.execute(
         "UPDATE meetings SET status = 'interrupted', ended_at = COALESCE(ended_at, started_at)

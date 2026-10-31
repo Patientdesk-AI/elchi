@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build, sign, notarize and package Elchi for macOS.
+# Build, sign, notarize and package Eshlik for macOS.
 #
 #   ELCHI_SIGNING_IDENTITY="Developer ID Application: <Team name> (<TEAMID>)" \
 #   ELCHI_NOTARY_PROFILE=elchi-notary \
@@ -20,14 +20,14 @@
 # - a notarytool Keychain profile, created once with
 #     xcrun notarytool store-credentials elchi-notary --key <AuthKey.p8> --key-id <ID> --issuer <ISSUER>
 #   (or --apple-id/--team-id with an app-specific password);
-# - Elchi's updater key at ~/.tauri/elchi-updater.key, its password in the
+# - Eshlik's updater key at ~/.tauri/elchi-updater.key, its password in the
 #   Keychain item "elchi-updater-key-password".
 #
 # Order matters: the app is notarized and stapled first, and only then packed
 # into the updater bundle and the DMG, so both carry the same notarized app.
 #
-# Output: release-out/<version>/ with Elchi_<v>_aarch64.dmg,
-# Elchi_<v>_aarch64.app.tar.gz and its .sig.
+# Output: release-out/<version>/ with Eshlik_<v>_aarch64.dmg,
+# Eshlik_<v>_aarch64.app.tar.gz and its .sig.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -61,7 +61,7 @@ TAURI_SIGNING_PRIVATE_KEY="$(cat "$HOME/.tauri/elchi-updater.key")"
 TAURI_SIGNING_PRIVATE_KEY_PASSWORD="$(security find-generic-password -s elchi-updater-key-password -w)"
 export TAURI_SIGNING_PRIVATE_KEY TAURI_SIGNING_PRIVATE_KEY_PASSWORD
 
-echo "==> Building Elchi $VERSION for $TARGET, signed as: ${IDENTITY:-Developer ID of team $CLOUD_TEAM, in the cloud}"
+echo "==> Building Eshlik $VERSION for $TARGET, signed as: ${IDENTITY:-Developer ID of team $CLOUD_TEAM, in the cloud}"
 rustup target add aarch64-apple-darwin >/dev/null
 # Tauri signs the app (hardened runtime, entitlements from tauri.conf.json),
 # ad hoc when it is to be cloud signed. Its own notarization is skipped (no
@@ -72,7 +72,7 @@ APPLE_SIGNING_IDENTITY="${IDENTITY:--}" CI=true \
   --config '{"bundle":{"createUpdaterArtifacts":false}}'
 
 BUNDLE="$ROOT/src-tauri/target/$TARGET/release/bundle/macos"
-APP="$BUNDLE/Elchi.app"
+APP="$BUNDLE/Eshlik.app"
 [ -d "$APP" ] || fail "no app bundle at $APP"
 
 if [ -n "$CLOUD_TEAM" ]; then
@@ -80,11 +80,11 @@ if [ -n "$CLOUD_TEAM" ]; then
   # Xcode only exports archives, so the app goes into one; it re-signs with
   # the entitlements the app carries, so it is signed ad hoc with them first.
   WORK="$(mktemp -d)"
-  ARCHIVE="$WORK/Elchi.xcarchive"
+  ARCHIVE="$WORK/Eshlik.xcarchive"
   mkdir -p "$ARCHIVE/Products/Applications"
-  ditto "$APP" "$ARCHIVE/Products/Applications/Elchi.app"
+  ditto "$APP" "$ARCHIVE/Products/Applications/Eshlik.app"
   codesign --force --deep --options runtime --entitlements "$ROOT/src-tauri/Entitlements.plist" \
-    --sign - "$ARCHIVE/Products/Applications/Elchi.app"
+    --sign - "$ARCHIVE/Products/Applications/Eshlik.app"
   BUNDLE_ID="$(defaults read "$APP/Contents/Info.plist" CFBundleIdentifier)"
   BUILD="$(defaults read "$APP/Contents/Info.plist" CFBundleVersion)"
   cat > "$ARCHIVE/Info.plist" <<PLIST
@@ -92,7 +92,7 @@ if [ -n "$CLOUD_TEAM" ]; then
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
   <key>ApplicationProperties</key><dict>
-    <key>ApplicationPath</key><string>Applications/Elchi.app</string>
+    <key>ApplicationPath</key><string>Applications/Eshlik.app</string>
     <key>Architectures</key><array><string>arm64</string></array>
     <key>CFBundleIdentifier</key><string>$BUNDLE_ID</string>
     <key>CFBundleShortVersionString</key><string>$VERSION</string>
@@ -102,8 +102,8 @@ if [ -n "$CLOUD_TEAM" ]; then
   </dict>
   <key>ArchiveVersion</key><integer>2</integer>
   <key>CreationDate</key><date>$(date -u +%Y-%m-%dT%H:%M:%SZ)</date>
-  <key>Name</key><string>Elchi</string>
-  <key>SchemeName</key><string>Elchi</string>
+  <key>Name</key><string>Eshlik</string>
+  <key>SchemeName</key><string>Eshlik</string>
 </dict></plist>
 PLIST
   cat > "$WORK/ExportOptions.plist" <<PLIST
@@ -118,7 +118,7 @@ PLIST
 PLIST
   xcodebuild -exportArchive -archivePath "$ARCHIVE" -exportPath "$WORK/export" \
     -exportOptionsPlist "$WORK/ExportOptions.plist" -allowProvisioningUpdates >/dev/null
-  rm -rf "$APP" && ditto "$WORK/export/Elchi.app" "$APP"
+  rm -rf "$APP" && ditto "$WORK/export/Eshlik.app" "$APP"
   rm -rf "$WORK"
   SIGNED_BY="$(codesign -dv --verbose=2 "$APP" 2>&1)"
   grep -q "^Authority=Developer ID Application: .*($CLOUD_TEAM)$" <<<"$SIGNED_BY" \
@@ -128,7 +128,7 @@ codesign --verify --deep --strict --verbose=2 "$APP"
 
 echo "==> Notarizing the app"
 rm -rf "$OUT" && mkdir -p "$OUT"
-ZIP="$OUT/Elchi-notarize.zip"
+ZIP="$OUT/Eshlik-notarize.zip"
 ditto -c -k --keepParent "$APP" "$ZIP"
 xcrun notarytool submit "$ZIP" --keychain-profile "$PROFILE" --wait
 rm -f "$ZIP"
@@ -136,15 +136,15 @@ xcrun stapler staple "$APP"
 spctl --assess --type execute --verbose "$APP"
 
 echo "==> Updater bundle"
-TARBALL="$OUT/Elchi_${VERSION}_${ARCH_LABEL}.app.tar.gz"
+TARBALL="$OUT/Eshlik_${VERSION}_${ARCH_LABEL}.app.tar.gz"
 # Without macOS metadata: bsdtar otherwise stores each file's extended
 # attributes (com.apple.provenance, quarantine) as AppleDouble "._<name>"
 # entries. The updater (tauri-plugin-updater) unpacks every entry with the
-# top folder stripped, so "._Elchi.app" lands on the extract folder itself and
+# top folder stripped, so "._Eshlik.app" lands on the extract folder itself and
 # fails with "Operation not permitted": the update downloads, then never
 # installs. The check reads the entries with Python's tarfile, as bsdtar's own
 # listing folds the "._" entries back into attributes and hides them.
-COPYFILE_DISABLE=1 tar --no-mac-metadata --no-xattrs -C "$BUNDLE" -czf "$TARBALL" Elchi.app
+COPYFILE_DISABLE=1 tar --no-mac-metadata --no-xattrs -C "$BUNDLE" -czf "$TARBALL" Eshlik.app
 python3 -I -c 'import sys, tarfile; sys.exit(any(n.rsplit("/", 1)[-1].startswith("._") for n in tarfile.open(sys.argv[1]).getnames()))' "$TARBALL" \
   || fail "updater bundle still carries AppleDouble ._ entries"
 bunx tauri signer sign "$TARBALL" >/dev/null
@@ -153,9 +153,9 @@ bunx tauri signer sign "$TARBALL" >/dev/null
 echo "==> DMG"
 # The window it opens: the branded drag-to-Applications background
 # (scripts/brand/dmg_background.html), laid out by dmgbuild without driving Finder.
-DMG="$OUT/Elchi_${VERSION}_${ARCH_LABEL}.dmg"
+DMG="$OUT/Eshlik_${VERSION}_${ARCH_LABEL}.dmg"
 uvx -q dmgbuild -s "$ROOT/scripts/release/dmg_settings.py" -D app="$APP" \
-  -D background="$ROOT/scripts/release/dmg/background.tiff" "Elchi" "$DMG"
+  -D background="$ROOT/scripts/release/dmg/background.tiff" "Eshlik" "$DMG"
 if [ -n "$IDENTITY" ]; then
   codesign --sign "$IDENTITY" --timestamp "$DMG"
 fi

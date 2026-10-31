@@ -1,4 +1,4 @@
-//! Duyu-small: Elchi's on-device Turkish + English recognizer.
+//! Duyu-small: Eshlik's on-device Turkish + English recognizer.
 //!
 //! A native port of the reference engine published with the model
 //! (https://huggingface.co/KaanAydinli/Duyu-small, `duyu_small/`): log-mel

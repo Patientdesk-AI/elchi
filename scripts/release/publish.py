@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Put an Elchi release on speech.patientdesk.ai.
+"""Put an Eshlik release on speech.patientdesk.ai.
 
     scripts/release/publish.py --site ~/dev/stt-website-elchi --windows-run <GitHub run id> \
         [--linux-run <GitHub run id>] [--notes "…"] [--windows-only]
 
 Takes the macOS files made by scripts/release/macos.sh (release-out/<version>/),
-the Windows installer from the "Elchi Windows build" workflow run and, with
---linux-run, the AppImage and .deb from the "Elchi Linux build" run (their
+the Windows installer from the "Eshlik Windows build" workflow run and, with
+--linux-run, the AppImage and .deb from the "Eshlik Linux build" run (their
 artifacts, downloaded with `gh`), then, in the website checkout:
 
 - copies them to public/downloads/elchi/<version>/ with SHA256SUMS, except files of
@@ -55,7 +55,7 @@ def check_updater_tarball(path: Path) -> None:
     """Refuse a macOS updater bundle the updater cannot install.
 
     tauri-plugin-updater unpacks every entry with its first path component
-    stripped, so an AppleDouble "._Elchi.app" entry (bsdtar's way of storing
+    stripped, so an AppleDouble "._Eshlik.app" entry (bsdtar's way of storing
     extended attributes) is written over the extract folder itself and the
     install fails after the download. scripts/release/macos.sh packs without
     them; this catches a bundle made any other way.
@@ -67,18 +67,18 @@ def check_updater_tarball(path: Path) -> None:
         sys.exit(f"{path.name} has AppleDouble entries the updater cannot install "
                  f"(e.g. {apple_double[0]}): repack it with "
                  "COPYFILE_DISABLE=1 tar --no-mac-metadata --no-xattrs")
-    if not all(n == "Elchi.app" or n.startswith("Elchi.app/") for n in names):
-        sys.exit(f"{path.name} must hold only Elchi.app/, found {names[:3]}")
+    if not all(n == "Eshlik.app" or n.startswith("Eshlik.app/") for n in names):
+        sys.exit(f"{path.name} must hold only Eshlik.app/, found {names[:3]}")
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--site", required=True, type=Path, help="website checkout (stt-website)")
-    ap.add_argument("--windows-run", required=True, help="run id of the 'Elchi Windows build' workflow")
+    ap.add_argument("--windows-run", required=True, help="run id of the 'Eshlik Windows build' workflow")
     ap.add_argument("--notes", default="", help="release notes shown by the updater")
     ap.add_argument("--windows-only", action="store_true",
                     help="publish the Windows installer alone (macOS keeps its 'coming soon')")
-    ap.add_argument("--linux-run", help="run id of the 'Elchi Linux build' workflow (AppImage and .deb)")
+    ap.add_argument("--linux-run", help="run id of the 'Eshlik Linux build' workflow (AppImage and .deb)")
     ap.add_argument("--commit", help="the commit the release was built from (default: HEAD); tags the GitHub release")
     args = ap.parse_args()
 
@@ -157,7 +157,7 @@ def main() -> None:
         tag = f"v{version}"
         if subprocess.run(["gh", "release", "view", tag, "-R", REPO], capture_output=True).returncode != 0:
             subprocess.run(["gh", "release", "create", tag, "-R", REPO, "--target", commit_full,
-                            "--title", f"Elchi {version}", "--notes", args.notes or f"Elchi {version}"], check=True)
+                            "--title", f"Eshlik {version}", "--notes", args.notes or f"Eshlik {version}"], check=True)
         subprocess.run(["gh", "release", "upload", tag, "-R", REPO, "--clobber",
                         *[str(sources[n]) for n in remote]], check=True)
         for n in remote:
@@ -198,7 +198,7 @@ def main() -> None:
     }
     (args.site / "public/downloads/elchi/latest.json").write_text(json.dumps(manifest, indent=1) + "\n")
 
-    print(f"Elchi {version} staged in {args.site}:")
+    print(f"Eshlik {version} staged in {args.site}:")
     for f in files:
         print(f"  {f['name']}  {f['bytes'] / 1e6:.1f} MB")
     print("Review `git -C <site> status`, then commit and push the site's main to deploy.")

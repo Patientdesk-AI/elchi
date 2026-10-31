@@ -10,8 +10,8 @@
     <string>en</string>
   </array>
   <key>NSMicrophoneUsageDescription</key>
-  <string>Elchi, konuşmanızı yazıya dökmek için mikrofonu kullanır.</string>
+  <string>Eshlik, konuşmanızı yazıya dökmek için mikrofonu kullanır.</string>
   <key>NSAudioCaptureUsageDescription</key>
-  <string>Elchi, toplantı notları için görüşmedeki diğer kişilerin sesini kaydeder.</string>
+  <string>Eshlik, toplantı notları için görüşmedeki diğer kişilerin sesini kaydeder.</string>
 </dict>
 </plist>

@@ -84,7 +84,7 @@ export const getSupportedLanguage = (
   return supported ? supported.code : null;
 };
 
-// Elchi's interface is Turkish unless the user switches to English.
+// Eshlik's interface is Turkish unless the user switches to English.
 // Language will be synced from settings after init
 i18n.use(initReactI18next).init({
   resources,

@@ -1,6 +1,6 @@
-//! Learning from corrections on macOS: after Elchi pastes a dictation, it watches the
+//! Learning from corrections on macOS: after Eshlik pastes a dictation, it watches the
 //! text field it pasted into for a minute and a half (through Accessibility, which
-//! Elchi already has to paste) and compares what it pasted with what that stretch of
+//! Eshlik already has to paste) and compares what it pasted with what that stretch of
 //! text became. The correction becomes the dictation's text on the home feed, and a
 //! fixed name becomes a dictionary entry (crate::dictionary::correct_dictation).
 //!
@@ -79,7 +79,7 @@ impl Field {
     }
 
     /// The field's text, with non-breaking spaces and carriage returns made plain (one
-    /// unit for one, so offsets stay put): rich editors report those where Elchi
+    /// unit for one, so offsets stay put): rich editors report those where Eshlik
     /// pasted spaces and newlines.
     fn text(&self) -> Option<Vec<u16>> {
         let value = attribute(self.0.as_CFTypeRef() as AXUIElementRef, "AXValue")?;

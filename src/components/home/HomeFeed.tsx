@@ -66,8 +66,8 @@ const DayHeader: React.FC<{
 );
 
 /**
- * Elchi's home: this week up top, then everything you dictated, newest
- * first and grouped by day, each from the app it went into, with Elchi's
+ * Eshlik's home: this week up top, then everything you dictated, newest
+ * first and grouped by day, each from the app it went into, with Eshlik's
  * own posts in between (words it learned, streaks, milestones, the trial).
  * History lives here too: hover a dictation to copy, fix, add a word to the
  * dictionary or play its recording; older ones load as you scroll.
@@ -434,7 +434,7 @@ export const HomeFeed: React.FC<{
     return out.sort((a, b) => b.at - a.at);
   }, [entries, dictionary, stats, now]);
 
-  // The search's results, as dictation items: Elchi's posts stay out of them.
+  // The search's results, as dictation items: Eshlik's posts stay out of them.
   const foundItems = useMemo<Item[]>(
     () =>
       (found?.entries ?? []).map((e) => ({

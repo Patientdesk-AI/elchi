@@ -1,6 +1,6 @@
-name: "Elchi Linux build"
+name: "Eshlik Linux build"
 
-# Builds Elchi for Linux (x64) with its updater signature and keeps the packages
+# Builds Eshlik for Linux (x64) with its updater signature and keeps the packages
 # as workflow artifacts; scripts/release/publish.py takes them from there.
 # - .deb on Ubuntu 22.04, the oldest glibc we build against, so it installs on
 #   22.04 and newer and on Debian 12;

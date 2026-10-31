@@ -1,5 +1,5 @@
-//! Duyu Pro in Elchi: the first 7 days after a machine first registers, and
-//! for Elchi Pro subscribers, recordings are transcribed by Duyu Pro (the
+//! Duyu Pro in Eshlik: the first 7 days after a machine first registers, and
+//! for Eshlik Pro subscribers, recordings are transcribed by Duyu Pro (the
 //! cloud model `duyu-1`); otherwise by Duyu-small on this computer.
 //!
 //! The entitlement lives on speech.patientdesk.ai. The app registers the
@@ -9,7 +9,7 @@
 //! failure falls back to Duyu-small, so dictation keeps working offline.
 //!
 //! Every install, on any plan, also gets a formatting token. Dictated text,
-//! from either model, goes to Elchi's formatter (an open model on our own
+//! from either model, goes to Eshlik's formatter (an open model on our own
 //! servers beside Duyu Pro) to be laid out as it would have been typed:
 //! fillers and self-corrections gone, lists and paragraphs made. Formatting is
 //! a setting, on by default; when it is off, slow or unreachable, the text is
@@ -186,11 +186,11 @@ async fn request_session_for(id: &str, locale: String) -> Result<ElchiSession> {
         .context("could not reach speech.patientdesk.ai")?;
     let status = resp.status();
     if !status.is_success() {
-        bail!("Elchi session request returned {status}");
+        bail!("Eshlik session request returned {status}");
     }
     resp.json::<ElchiSession>()
         .await
-        .context("unexpected Elchi session response")
+        .context("unexpected Eshlik session response")
 }
 
 pub struct ElchiPro {
@@ -224,7 +224,7 @@ impl ElchiPro {
                 let due = last.is_none_or(|t| t.elapsed() >= REFRESH_EVERY);
                 if due || watching {
                     if let Err(e) = this.refresh() {
-                        debug!("Elchi session refresh failed: {e:#}");
+                        debug!("Eshlik session refresh failed: {e:#}");
                     }
                     last = Some(std::time::Instant::now());
                 }
@@ -257,7 +257,7 @@ impl ElchiPro {
         let session =
             std::thread::spawn(move || tauri::async_runtime::block_on(request_session(locale)))
                 .join()
-                .map_err(|_| anyhow!("Elchi session thread panicked"))??;
+                .map_err(|_| anyhow!("Eshlik session thread panicked"))??;
 
         let mut settings = get_settings(&self.app);
         let before = settings.elchi_session.as_ref().map(|s| s.plan);
@@ -265,7 +265,7 @@ impl ElchiPro {
         write_settings(&self.app, settings);
 
         if before != Some(session.plan) {
-            info!("Elchi plan: {:?} -> {:?}", before, session.plan);
+            info!("Eshlik plan: {:?} -> {:?}", before, session.plan);
             if session.plan == Plan::Pro {
                 *self.watch_until.lock().unwrap() = None;
             }
@@ -323,7 +323,7 @@ impl ElchiPro {
             let this = self.clone();
             std::thread::spawn(move || {
                 if let Err(e) = this.refresh() {
-                    debug!("Elchi session refresh for formatting failed: {e:#}");
+                    debug!("Eshlik session refresh for formatting failed: {e:#}");
                 }
             });
         }
@@ -369,7 +369,7 @@ impl ElchiPro {
     /// Called when a transcription learns the plan no longer covers Duyu Pro.
     pub fn mark_not_entitled(&self) {
         if let Err(e) = self.refresh() {
-            warn!("Elchi session refresh after a refused request failed: {e:#}");
+            warn!("Eshlik session refresh after a refused request failed: {e:#}");
         }
     }
 
@@ -463,7 +463,7 @@ struct FormatResponse {
     formatted: bool,
 }
 
-/// Dictated text laid out by Elchi's formatter, or None when it could not be
+/// Dictated text laid out by Eshlik's formatter, or None when it could not be
 /// (the caller pastes the text as transcribed).
 pub async fn format(
     token: &str,
@@ -483,16 +483,16 @@ pub async fn format(
     let out = match resp {
         Ok(r) if r.status().is_success() => r.json::<FormatResponse>().await.ok(),
         Ok(r) => {
-            warn!("Elchi formatter returned {}", r.status());
+            warn!("Eshlik formatter returned {}", r.status());
             None
         }
         Err(e) => {
-            warn!("Elchi formatter unreachable: {e}");
+            warn!("Eshlik formatter unreachable: {e}");
             None
         }
     };
     debug!(
-        "Elchi formatter: {:?} in {:?}",
+        "Eshlik formatter: {:?} in {:?}",
         out.as_ref().map(|r| r.formatted),
         started.elapsed()
     );

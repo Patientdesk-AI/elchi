@@ -1,7 +1,7 @@
-//! Elchi's personal dictionary: the names, brands and terms a user dictates, and how
+//! Eshlik's personal dictionary: the names, brands and terms a user dictates, and how
 //! the recognizer tends to mishear them.
 //!
-//! Entries come from three places: corrections Elchi notices (`learn`; on macOS it
+//! Entries come from three places: corrections Eshlik notices (`learn`; on macOS it
 //! reads the text field back after pasting, see `watch`), edits made to a dictation
 //! in History, and words the user adds. They are used where context decides: the
 //! formatter (crate::elchi_pro::format) gets every entry with its misheard forms and
@@ -29,7 +29,7 @@ const MAX_FOR_FORMATTER: usize = 200;
 pub struct DictionaryWord {
     /// As the user writes it: "Kaan", "PatientDesk".
     pub word: String,
-    /// How Elchi wrote it before it was corrected: "Kan".
+    /// How Eshlik wrote it before it was corrected: "Kan".
     #[serde(default)]
     pub heard: Vec<String>,
     /// Learned from a correction, rather than added by the user.

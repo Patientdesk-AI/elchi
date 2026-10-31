@@ -18,7 +18,7 @@
     "about": "About",
     "label": "Sections",
     "dictionary": "Dictionary",
-    "back": "ELCHI",
+    "back": "ESHLIK",
     "hints": {
       "general": "G",
       "models": "M",
@@ -122,7 +122,7 @@
       "selectModel": "Failed to select model"
     },
     "permissions": {
-      "description": "So Elchi can hear you and type the text where your cursor is.",
+      "description": "So Eshlik can hear you and type the text where your cursor is.",
       "microphone": {
         "title": "Microphone",
         "description": "To turn what you say into text."
@@ -141,19 +141,19 @@
       },
       "title_one": "One permission first.",
       "title_other": "Two permissions first.",
-      "descriptionMicrophone": "So Elchi can hear you.",
+      "descriptionMicrophone": "So Eshlik can hear you.",
       "openSettings": "Open Settings",
       "note": "System Settings will open",
       "noteWindows": "Windows Settings will open",
       "progress": "{{granted}} of {{total}} permissions granted",
       "stuck": {
         "title": "Not coming through?",
-        "body": "If Elchi already looks switched on in System Settings, macOS may be holding an old entry from an earlier version. Reset the permissions here, then allow them again. If it still waits, restart Elchi.",
-        "bodyRestart": "If the permission is on in Settings but not confirmed here, restart Elchi.",
+        "body": "If Eshlik already looks switched on in System Settings, macOS may be holding an old entry from an earlier version. Reset the permissions here, then allow them again. If it still waits, restart Eshlik.",
+        "bodyRestart": "If the permission is on in Settings but not confirmed here, restart Eshlik.",
         "reset": "Reset permissions",
-        "restart": "Restart Elchi",
+        "restart": "Restart Eshlik",
         "resetDone": "Permissions reset. Allow them again.",
-        "resetFailed": "Couldn't reset the permissions. Restart Elchi and try again."
+        "resetFailed": "Couldn't reset the permissions. Restart Eshlik and try again."
       }
     },
     "tour": {
@@ -161,9 +161,9 @@
       "back": "Back",
       "next": "Continue",
       "skip": "Skip for now",
-      "start": "Start using Elchi",
+      "start": "Start using Eshlik",
       "welcome": {
-        "title": "Speak, and Elchi writes.",
+        "title": "Speak, and Eshlik writes.",
         "lede": "The text lands where your cursor is: an e-mail, a document, a chat. Often faster than typing.",
         "anywhere": {
           "title": "In every app",
@@ -187,7 +187,7 @@
         },
         "free": {
           "title": "Free with Duyu-small",
-          "body": "Elchi runs free on this computer with Duyu-small; move to Pro whenever you like."
+          "body": "Eshlik runs free on this computer with Duyu-small; move to Pro whenever you like."
         }
       },
       "how": {
@@ -205,7 +205,7 @@
         "title": "Give it a try.",
         "instructionHold": "Hold the shortcut, read the sentence, let go.",
         "instructionToggle": "Press the shortcut, read the sentence, press it again.",
-        "phrase": "Merhaba Elchi, yarınki meeting'i saat üçe alalım ve notları herkesle paylaşalım.",
+        "phrase": "Merhaba Eshlik, yarınki meeting'i saat üçe alalım ve notları herkesle paylaşalım.",
         "boxLabel": "Your text will land here",
         "placeholder": "The cursor is here; what you say will be typed here.",
         "successTitle": "That's it.",
@@ -279,7 +279,7 @@
   "settings": {
     "general": {
       "shortcut": {
-        "title": "Elchi Shortcuts",
+        "title": "Eshlik Shortcuts",
         "description": "Configure keyboard shortcuts to trigger speech-to-text recording",
         "external": "Set by your desktop (Hyprland, via elchi-omarchy-setup). Change it in a terminal: elchi-omarchy-setup --key …",
         "loading": "Loading shortcuts...",
@@ -356,15 +356,15 @@
         "trialDays_one": "Trial · {{count}} day left",
         "trialDays_other": "Trial · {{count}} days left",
         "trialEnded": "Trial ended",
-        "proPlan": "ELCHI PRO",
+        "proPlan": "ESHLIK PRO",
         "headline": "Our most accurate model. Fewer mistakes with fast speech, names and numbers.",
-        "freeNote": "Elchi now runs on this computer with Duyu-small.",
+        "freeNote": "Eshlik now runs on this computer with Duyu-small.",
         "cta": "Get Pro",
         "price": "{{price}} / month",
         "freeMonths_one": "First month free",
         "freeMonths_other": "First {{count}} months free",
-        "active": "ELCHI PRO is on",
-        "activeUntil": "ELCHI PRO is on · until {{date}}",
+        "active": "ESHLIK PRO is on",
+        "activeUntil": "ESHLIK PRO is on · until {{date}}",
         "useCloudOff": "When off: Duyu-small"
       },
       "local": {
@@ -454,11 +454,11 @@
       },
       "autostart": {
         "label": "Launch on Startup",
-        "description": "Automatically start Elchi when you log in to your computer."
+        "description": "Automatically start Eshlik when you log in to your computer."
       },
       "showTrayIcon": {
         "label": "Show Tray Icon",
-        "description": "Display the Elchi icon in the system tray."
+        "description": "Display the Eshlik icon in the system tray."
       },
       "overlay": {
         "style": {
@@ -585,11 +585,11 @@
       },
       "showInDock": {
         "label": "Show in Dock",
-        "description": "Keep Elchi in the Dock when its window is closed, so you can always click it to come back. Off, Elchi is only in the menu bar."
+        "description": "Keep Eshlik in the Dock when its window is closed, so you can always click it to come back. Off, Eshlik is only in the menu bar."
       },
       "meetingDetection": {
         "label": "Offer notes in calls",
-        "description": "When Zoom, Teams, Google Meet or another call starts using your microphone, Elchi offers to take notes, and asks whether to stop when the call ends."
+        "description": "When Zoom, Teams, Google Meet or another call starts using your microphone, Eshlik offers to take notes, and asks whether to stop when the call ends."
       },
       "meetingKeepRecording": {
         "label": "Keep meeting recordings",
@@ -681,7 +681,7 @@
       },
       "updateChecks": {
         "label": "Check for Updates",
-        "description": "Automatically check for new versions of Elchi",
+        "description": "Automatically check for new versions of Eshlik",
         "lockedDescription": "Disabled by system configuration (HANDY_DISABLE_UPDATER)"
       },
       "whatsNewPreview": {
@@ -774,7 +774,7 @@
       },
       "keyboardDiagnostic": {
         "title": "Keyboard Diagnostic",
-        "description": "Checks whether keyboard events reach Elchi. Only event counts are recorded — never which keys you press.",
+        "description": "Checks whether keyboard events reach Eshlik. Only event counts are recorded — never which keys you press.",
         "run": "Run 10s diagnostic",
         "running": "Listening… press your shortcut a few times (e.g. Option+Space)",
         "secureInputLabel": "Secure Input",
@@ -788,7 +788,7 @@
         "mouse": "Mouse",
         "verdictBlocked": "Secure Input is blocking key events — keyed shortcuts cannot work until it is resolved.",
         "verdictSuspicious": "Modifier events arrived but no key events — something is suppressing keys even though Secure Input reports disabled. Please report this on GitHub.",
-        "verdictOk": "Key events are reaching Elchi normally.",
+        "verdictOk": "Key events are reaching Eshlik normally.",
         "verdictNoEvents": "No events captured — did you press any keys during the test?",
         "failed": "Diagnostic failed: {{error}}"
       },
@@ -803,22 +803,22 @@
       "title": "About",
       "version": {
         "title": "Version",
-        "description": "Current version of Elchi"
+        "description": "Current version of Eshlik"
       },
       "whatsNewUpdates": {
         "label": "Show What's New",
-        "description": "Show release notes after Elchi updates"
+        "description": "Show release notes after Eshlik updates"
       },
       "appDataDirectory": {
         "title": "App Data Directory",
-        "description": "Location where Elchi stores its data"
+        "description": "Location where Eshlik stores its data"
       },
       "acknowledgments": {
         "title": "Acknowledgments",
         "handy": {
           "title": "Handy",
-          "description": "The open-source dictation app Elchi is built on",
-          "details": "Elchi is based on Handy by CJ Pais and contributors, released under the MIT license. Thank you for making it open.",
+          "description": "The open-source dictation app Eshlik is built on",
+          "details": "Eshlik is based on Handy by CJ Pais and contributors, released under the MIT license. Thank you for making it open.",
           "button": "View on GitHub"
         },
         "ggml": {
@@ -854,11 +854,11 @@
     "updateAvailableVersion": "Update available · <v>v{{version}}</v>",
     "installAndRestart": "Install and restart",
     "updateCheckFailed": "Couldn't check for updates. Check your connection and try again.",
-    "updateInstallFailed": "The update couldn't be installed. Try again, or download the latest Elchi from speech.patientdesk.ai/elchi.",
-    "updateRelaunchFailed": "The update is installed. Quit and reopen Elchi to start the new version."
+    "updateInstallFailed": "The update couldn't be installed. Try again, or download the latest Eshlik from speech.patientdesk.ai/elchi.",
+    "updateRelaunchFailed": "The update is installed. Quit and reopen Eshlik to start the new version."
   },
   "whatsNew": {
-    "title": "New in Elchi {{version}}"
+    "title": "New in Eshlik {{version}}"
   },
   "common": {
     "loading": "Loading...",
@@ -875,7 +875,7 @@
     "selectOption": "Select an option…"
   },
   "accessibility": {
-    "permissionsDescription": "Elchi needs accessibility permissions to type transcribed text.",
+    "permissionsDescription": "Eshlik needs accessibility permissions to type transcribed text.",
     "openSettings": "Open System Settings"
   },
   "errors": {
@@ -898,11 +898,11 @@
   },
   "appLanguage": {
     "title": "Application Language",
-    "description": "Change the language of the Elchi interface"
+    "description": "Change the language of the Eshlik interface"
   },
   "theme": {
     "title": "Application Theme",
-    "description": "Choose whether Elchi follows your system theme or stays light or dark",
+    "description": "Choose whether Eshlik follows your system theme or stays light or dark",
     "options": {
       "system": "System",
       "light": "Light",
@@ -934,7 +934,7 @@
     "label": "Secure keyboard entry is on"
   },
   "elchiPro": {
-    "cta": "Get Elchi Pro",
+    "cta": "Get Eshlik Pro",
     "upgradeFailed": "Couldn't open the browser. You can continue at speech.patientdesk.ai/elchi.",
     "card": {
       "eyebrow": "Duyu Pro",
@@ -945,7 +945,7 @@
       "trial_one": "Your Duyu Pro trial: {{count}} day left.",
       "trial_other": "Your Duyu Pro trial: {{count}} days left.",
       "ended": "Your Duyu Pro trial has ended.",
-      "endedDetail": "Elchi now runs with Duyu-small. Get Elchi Pro: first month free, no card needed.",
+      "endedDetail": "Eshlik now runs with Duyu-small. Get Eshlik Pro: first month free, no card needed.",
       "dismiss": "Dismiss"
     },
     "badge": {
@@ -955,9 +955,9 @@
   },
   "dictionary": {
     "title": "Dictionary",
-    "intro": "Names, brands and terms. Elchi writes them the way you do.",
-    "howMac": "When you fix a word Elchi wrote (Kan → Kaan), it learns on its own. You can also teach it by editing a dictation in History.",
-    "howOther": "When you fix a dictation in History (Kan → Kaan), Elchi learns the new names. You can add words here too.",
+    "intro": "Names, brands and terms. Eshlik writes them the way you do.",
+    "howMac": "When you fix a word Eshlik wrote (Kan → Kaan), it learns on its own. You can also teach it by editing a dictation in History.",
+    "howOther": "When you fix a dictation in History (Kan → Kaan), Eshlik learns the new names. You can add words here too.",
     "addPlaceholder": "Add a word, e.g. PatientDesk",
     "add": "Add",
     "learned": "learned",
@@ -969,7 +969,7 @@
     "count_one": "{{count}} word",
     "count_other": "{{count}} words",
     "phrasesTitle": "Corrected phrases",
-    "phrasesHint": "Groups of words Elchi misheard and you corrected. If the same mistake comes back, formatting fixes it.",
+    "phrasesHint": "Groups of words Eshlik misheard and you corrected. If the same mistake comes back, formatting fixes it.",
     "heardLabel": "Heard",
     "emptyHint": "No words yet",
     "example": "Example",
@@ -982,7 +982,7 @@
     "engineLocal": "Duyu-small",
     "today": "Today",
     "yesterday": "Yesterday",
-    "fromElchi": "From Elchi",
+    "fromElchi": "From Eshlik",
     "words_one": "{{n}} word",
     "words_other": "{{n}} words",
     "formatted": "formatted",
@@ -1050,7 +1050,7 @@
       "label": "Fix the text",
       "save": "Save",
       "cancel": "Cancel",
-      "hint": "Fix it and Elchi learns new names",
+      "hint": "Fix it and Eshlik learns new names",
       "editing": "Editing",
       "saved": "Fix saved"
     },
@@ -1067,7 +1067,7 @@
       "trialText": "Fewer corrections with fast speech, names and numbers.",
       "freeLabel": "Duyu Pro",
       "freeTitle": "Your Duyu Pro trial has ended.",
-      "freeText": "Elchi now runs with Duyu-small.",
+      "freeText": "Eshlik now runs with Duyu-small.",
       "price": "{{price}} / month",
       "freeMonths_one": "First month free",
       "freeMonths_other": "First {{count}} months free",
@@ -1104,7 +1104,7 @@
     "writing": "Writing the notes…",
     "empty": "Nobody was heard in this meeting.",
     "proOnly": "Meeting notes are written with Duyu Pro. The transcript is here; with Duyu Pro I can write the notes too.",
-    "interrupted": "This meeting was cut short when Elchi quit. The transcript is here, and I can write the notes now.",
+    "interrupted": "This meeting was cut short when Eshlik quit. The transcript is here, and I can write the notes now.",
     "failed": "The notes couldn't be written. The transcript is here; try again.",
     "upgrade": "Get Duyu Pro",
     "retry": "Write the notes",
@@ -1134,8 +1134,8 @@
     },
     "new": {
       "title": "New meeting",
-      "body": "Elchi listens through your microphone and your computer's sound; nothing joins the call. When you end it, I write the notes around your own.",
-      "bodyFree": "Elchi listens through your microphone and your computer's sound; nothing joins the call. The transcript is free; the notes are written with Duyu Pro.",
+      "body": "Eshlik listens through your microphone and your computer's sound; nothing joins the call. When you end it, I write the notes around your own.",
+      "bodyFree": "Eshlik listens through your microphone and your computer's sound; nothing joins the call. The transcript is free; the notes are written with Duyu Pro.",
       "start": "Start meeting"
     },
     "live": {
@@ -1168,13 +1168,13 @@
     "titlePlaceholder": "Untitled meeting",
     "legend": {
       "mine": "What you wrote",
-      "elchi": "What Elchi added from the meeting"
+      "elchi": "What Eshlik added from the meeting"
     },
     "showTranscript_one": "Show transcript · {{count}} line",
     "showTranscript_other": "Show transcript · {{count}} lines",
     "hideTranscript": "Hide transcript",
     "pill": {
-      "open": "Open the meeting in Elchi",
+      "open": "Open the meeting in Eshlik",
       "listening": "Listening",
       "startTitle": "In a meeting?",
       "startBody": "{{app}} is using your microphone.",

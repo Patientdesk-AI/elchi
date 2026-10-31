@@ -1,10 +1,10 @@
-# dmgbuild settings for Elchi's DMG window: the branded background
-# (scripts/brand/dmg_background.html, rendered to dmg/background.tiff), Elchi on the
+# dmgbuild settings for Eshlik's DMG window: the branded background
+# (scripts/brand/dmg_background.html, rendered to dmg/background.tiff), Eshlik on the
 # left and Applications on the right where the artwork stages them, no toolbar or
 # sidebar, and the app icon as the volume's icon.
 #
-#   dmgbuild -s scripts/release/dmg_settings.py -D app=<path to Elchi.app> \
-#     -D background=scripts/release/dmg/background.tiff Elchi out.dmg
+#   dmgbuild -s scripts/release/dmg_settings.py -D app=<path to Eshlik.app> \
+#     -D background=scripts/release/dmg/background.tiff Eshlik out.dmg
 #
 # dmgbuild runs this file with exec and no __file__, so paths come in as -D values.
 import os.path

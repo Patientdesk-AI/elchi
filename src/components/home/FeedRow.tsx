@@ -40,7 +40,7 @@ export const GhostButton: React.FC<
   </button>
 );
 
-/** One of Elchi's own posts in the feed: a word it learned, a streak, a
+/** One of Eshlik's own posts in the feed: a word it learned, a streak, a
  *  milestone, the trial ending. The title is in the accent ink. */
 export const ElchiPost: React.FC<{
   when: string;
@@ -52,7 +52,7 @@ export const ElchiPost: React.FC<{
   <article className="grid grid-cols-[36px_minmax(0,1fr)] gap-4 py-[18px] hairline-t">
     <ElchiTile dark={dark} />
     <div className="flex flex-col gap-[7px] min-w-0">
-      <RowHead name="Elchi" when={when} />
+      <RowHead name="Eshlik" when={when} />
       <p className="text-[16px] leading-[1.45] tracking-[-0.005em] [text-wrap:pretty]">
         <span className="text-logo-primary">{title}</span>
         {body && <> {body}</>}

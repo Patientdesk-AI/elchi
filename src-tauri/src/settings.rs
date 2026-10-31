@@ -301,7 +301,7 @@ impl SoundTheme {
 }
 
 /// UI appearance mode. `System` follows the OS `prefers-color-scheme`; `Light`
-/// and `Dark` force one of the two palettes Elchi ships.
+/// and `Dark` force one of the two palettes Eshlik ships.
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Type)]
 #[serde(rename_all = "snake_case")]
 pub enum Theme {
@@ -366,7 +366,7 @@ impl fmt::Debug for SecretMap {
     }
 }
 
-/// A single secret (the Elchi Pro token): serialized as a plain string,
+/// A single secret (the Eshlik Pro token): serialized as a plain string,
 /// redacted in Debug output so it never reaches the logs.
 #[derive(Clone, Default, Serialize, Deserialize, Type)]
 #[serde(transparent)]
@@ -494,7 +494,7 @@ pub struct AppSettings {
     #[serde(default = "default_post_process_api_keys")]
     pub post_process_api_keys: SecretMap,
     /// Use Duyu Pro (the cloud model) whenever the plan includes it: the
-    /// first 7 days, and for Elchi Pro subscribers. See crate::elchi_pro.
+    /// first 7 days, and for Eshlik Pro subscribers. See crate::elchi_pro.
     #[serde(default = "default_true")]
     pub elchi_use_pro: bool,
     /// The last answer from speech.patientdesk.ai (plan, token).
@@ -503,7 +503,7 @@ pub struct AppSettings {
     /// The end of the trial has been shown to the user once.
     #[serde(default)]
     pub elchi_trial_end_seen: bool,
-    /// Lay dictated text out before pasting it (Elchi's formatter on our
+    /// Lay dictated text out before pasting it (Eshlik's formatter on our
     /// servers; see crate::elchi_pro). On by default, on every plan.
     #[serde(default = "default_true")]
     pub elchi_format: bool,
@@ -537,7 +537,7 @@ pub struct AppSettings {
     #[serde(default = "default_show_tray_icon")]
     pub show_tray_icon: bool,
     /// macOS: keep the Dock icon while the settings window is closed, so the
-    /// Dock brings Elchi back. Off, Elchi lives only in the menu bar then.
+    /// Dock brings Eshlik back. Off, Eshlik lives only in the menu bar then.
     #[serde(default = "default_show_in_dock")]
     pub show_in_dock: bool,
     /// Meetings (src/meeting): keep each meeting's audio and full transcript. Off, both are
@@ -601,7 +601,7 @@ pub struct AppSettings {
     /// `None`.
     #[serde(default)]
     pub overlay_idle_line: bool,
-    /// Label of a dictation key owned by the desktop rather than by Elchi
+    /// Label of a dictation key owned by the desktop rather than by Eshlik
     /// (Hyprland binds written by `elchi-omarchy-setup`). Shown in place of
     /// the in-app shortcut, which cannot capture keys on Wayland.
     #[serde(default)]
@@ -735,7 +735,7 @@ fn default_true() -> bool {
     true
 }
 
-/// Elchi's interface is Turkish by default, whatever the system language;
+/// Eshlik's interface is Turkish by default, whatever the system language;
 /// English is the one alternative (Settings > General).
 fn default_app_language() -> String {
     "tr".to_string()
@@ -1344,8 +1344,8 @@ fn apply_settings_migrations(
     updated
 }
 
-/// Whether this build ships a working self-updater: Elchi's own feed
-/// (speech.patientdesk.ai/downloads/elchi/latest.json), signed with Elchi's
+/// Whether this build ships a working self-updater: Eshlik's own feed
+/// (speech.patientdesk.ai/downloads/elchi/latest.json), signed with Eshlik's
 /// updater key (`plugins.updater` in tauri.conf.json).
 const SELF_UPDATE_AVAILABLE: bool = true;
 

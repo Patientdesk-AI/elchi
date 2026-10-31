@@ -1,5 +1,5 @@
 /**
- * Language metadata for supported locales. Elchi ships Turkish (the
+ * Language metadata for supported locales. Eshlik ships Turkish (the
  * default) and English.
  *
  * To add a new language:

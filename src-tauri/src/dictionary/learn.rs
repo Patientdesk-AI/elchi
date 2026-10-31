@@ -1,4 +1,4 @@
-//! What a correction teaches: given the text Elchi pasted and the same text after
+//! What a correction teaches: given the text Eshlik pasted and the same text after
 //! the user edited it, the words it should remember ("Kan" was really "Kaan").
 //!
 //! Only small, local fixes are lessons. A rewrite, a reworded sentence or a grammar

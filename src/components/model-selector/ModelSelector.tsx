@@ -209,8 +209,8 @@ const ModelSelector: React.FC = () => {
     return modelStatus;
   };
 
-  // Elchi has one local model, so there is nothing to pick here: show the
-  // engine that actually transcribes. During the trial and with Elchi Pro
+  // Eshlik has one local model, so there is nothing to pick here: show the
+  // engine that actually transcribes. During the trial and with Eshlik Pro
   // that is Duyu Pro in the cloud; otherwise Duyu-small on this computer
   // (or its download / load state).
   const displayStatus = getDisplayStatus();

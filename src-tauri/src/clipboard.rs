@@ -846,7 +846,7 @@ pub fn paste(text: String, app_handle: AppHandle) -> Result<PasteOutcome, String
         paste_method, paste_delay_ms, paste_delay_after_ms
     );
 
-    // When Elchi is sure nothing that takes text has focus, hold the dictation for the
+    // When Eshlik is sure nothing that takes text has focus, hold the dictation for the
     // overlay's Copy button instead of pasting into nothing, and skip auto-submit.
     // Without the overlay there would be no button, so it pastes as before.
     #[cfg(target_os = "macos")]

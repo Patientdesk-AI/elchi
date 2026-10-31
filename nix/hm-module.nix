@@ -1,4 +1,4 @@
-# Home-manager module for Elchi speech-to-text
+# Home-manager module for Eshlik speech-to-text
 #
 # Provides a systemd user service for autostart.
 # Usage: imports = [ elchi.homeManagerModules.default ];
@@ -14,19 +14,19 @@ let
 in
 {
   options.services.elchi = {
-    enable = lib.mkEnableOption "Elchi speech-to-text user service";
+    enable = lib.mkEnableOption "Eshlik speech-to-text user service";
 
     package = lib.mkOption {
       type = lib.types.package;
       defaultText = lib.literalExpression "elchi.packages.\${system}.elchi";
-      description = "The Elchi package to use.";
+      description = "The Eshlik package to use.";
     };
   };
 
   config = lib.mkIf cfg.enable {
     systemd.user.services.elchi = {
       Unit = {
-        Description = "Elchi speech-to-text";
+        Description = "Eshlik speech-to-text";
         After = [ "graphical-session.target" ];
         PartOf = [ "graphical-session.target" ];
       };

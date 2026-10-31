@@ -1,6 +1,6 @@
 # Build Instructions
 
-This guide covers how to set up the development environment and build Elchi from source across different platforms.
+This guide covers how to set up the development environment and build Eshlik from source across different platforms.
 
 ## Prerequisites
 
@@ -124,22 +124,22 @@ The raw binary (`src-tauri/target/release/elchi`) cannot run standalone — it n
 
 ```bash
 cd /tmp
-ar x /path/to/elchi/src-tauri/target/release/bundle/deb/Elchi_*_amd64.deb data.tar.gz
+ar x /path/to/elchi/src-tauri/target/release/bundle/deb/Eshlik_*_amd64.deb data.tar.gz
 tar xzf data.tar.gz
 sudo cp usr/bin/elchi /usr/bin/
 sudo cp -a usr/lib/. /usr/lib/
 sudo cp -r usr/share/icons/hicolor/* /usr/share/icons/hicolor/
-sudo cp usr/share/applications/Elchi.desktop /usr/share/applications/
+sudo cp usr/share/applications/Eshlik.desktop /usr/share/applications/
 ```
 
-The runtime libraries live in the app-private `/usr/lib/Elchi/` (on the binary's rpath), so no `ldconfig` step is needed.
+The runtime libraries live in the app-private `/usr/lib/Eshlik/` (on the binary's rpath), so no `ldconfig` step is needed.
 
 After subsequent rebuilds, copy the binary and any refreshed runtime libraries:
 
 ```bash
 sudo cp src-tauri/target/release/elchi /usr/bin/
-sudo mkdir -p /usr/lib/Elchi
-sudo cp -a src-tauri/transcribe-libs/. /usr/lib/Elchi/
+sudo mkdir -p /usr/lib/Eshlik
+sudo cp -a src-tauri/transcribe-libs/. /usr/lib/Eshlik/
 ```
 
 Resources only need re-copying if they change upstream (new icons, sounds, models, etc.).
@@ -150,15 +150,15 @@ Resources only need re-copying if they change upstream (new icons, sounds, model
 
 Local builds use the ad-hoc `signingIdentity: "-"`. A rebuild can have a new macOS code
 identity while the old **System Settings > Privacy & Security > Accessibility** entry
-remains visibly enabled, leaving Elchi on `Waiting...`.
+remains visibly enabled, leaving Eshlik on `Waiting...`.
 
-After installing the final bundle at `/Applications/Elchi.app`, quit Elchi, clear only its
+After installing the final bundle at `/Applications/Eshlik.app`, quit Eshlik, clear only its
 stale Accessibility record, then reopen it:
 
 ```bash
 osascript -e 'tell application id "com.elchi.app" to quit' || true
 tccutil reset Accessibility com.elchi.app
-open /Applications/Elchi.app
+open /Applications/Eshlik.app
 ```
 
 Grant Accessibility again when prompted. This does not reset Microphone or other TCC
@@ -168,8 +168,8 @@ For optional diagnosis, compare the designated requirements of the previous and 
 bundles:
 
 ```bash
-codesign -dr - /path/to/previous/Elchi.app 2>&1
-codesign -dr - /Applications/Elchi.app 2>&1
+codesign -dr - /path/to/previous/Eshlik.app 2>&1
+codesign -dr - /Applications/Eshlik.app 2>&1
 ```
 
 An ad-hoc requirement contains a `cdhash`; a changed requirement confirms the rebuild is
@@ -182,7 +182,7 @@ not covered by the old grant. The reset procedure does not require this check.
 The error from Tauri:
 
 ```
-Bundling Elchi_*_amd64.AppImage
+Bundling Eshlik_*_amd64.AppImage
 failed to bundle project `failed to run linuxdeploy`
 ```
 
@@ -191,7 +191,7 @@ Tauri swallows the real linuxdeploy error. To see it, run linuxdeploy manually:
 ```bash
 cd src-tauri/target/release/bundle/appimage
 ~/.cache/tauri/linuxdeploy-x86_64.AppImage --appimage-extract-and-run \
-  --appdir Elchi.AppDir --plugin gtk --output appimage
+  --appdir Eshlik.AppDir --plugin gtk --output appimage
 ```
 
 **Workaround:** The binary, deb, and rpm bundles all build fine — only the AppImage step fails. To skip it:
@@ -246,7 +246,7 @@ around either case with a short Cargo target directory:
 $env:CARGO_TARGET_DIR = "C:\h"
 
 # Or persist it for all future terminals (note: redirects ALL your
-# Rust projects' build output, not just Elchi):
+# Rust projects' build output, not just Eshlik):
 [Environment]::SetEnvironmentVariable('CARGO_TARGET_DIR', 'C:\h', 'User')
 ```
 
