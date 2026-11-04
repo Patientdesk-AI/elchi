@@ -18,7 +18,12 @@ import {
   type DictionaryWord,
   type HistoryEntry,
 } from "@/bindings";
-import { daysLeft, useElchiPro } from "@/hooks/useElchiPro";
+import {
+  daysLeft,
+  formatTry,
+  useElchiPro,
+  useRenewalReminder,
+} from "@/hooks/useElchiPro";
 import { useSettings } from "@/hooks/useSettings";
 import { useOsType } from "@/hooks/useOsType";
 import { formatKeyCombination } from "@/lib/utils/keyboard";
@@ -78,7 +83,8 @@ export const HomeFeed: React.FC<{
 }> = ({ onOpenSettings, onOpenMeetings }) => {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
-  const { status, upgrade } = useElchiPro();
+  const { status, upgrade, subscribe } = useElchiPro();
+  const renewal = useRenewalReminder(status);
   const { settings } = useSettings();
   const osType = useOsType();
   const dark = useIsDark();
@@ -391,6 +397,8 @@ export const HomeFeed: React.FC<{
 
   const onUpgrade = () =>
     upgrade().catch(() => toast.error(t("elchiPro.upgradeFailed")));
+  const onSubscribe = () =>
+    subscribe().catch(() => toast.error(t("elchiPro.renew.failed")));
 
   const openFolder = async () => {
     const r = await commands.openRecordingsFolder();
@@ -499,6 +507,7 @@ export const HomeFeed: React.FC<{
     trialDays !== null &&
     trialDays <= 3 &&
     dismissedTrial !== status?.trial_ends_at;
+  const renewPost = searching ? null : renewal;
   const showCard =
     !!status &&
     !open &&
@@ -555,6 +564,38 @@ export const HomeFeed: React.FC<{
                   {t("home.search.emptyBody", { query: query?.trim() })}
                 </p>
               </div>
+            )}
+
+            {renewPost && status && (
+              <section aria-label={t("home.fromElchi")}>
+                <DayHeader>{t("home.fromElchi")}</DayHeader>
+                <ElchiPost
+                  dark={dark}
+                  when={t("home.today")}
+                  title={t("home.renewTitle", { count: renewPost.days })}
+                  body={[
+                    t("home.renewBody", {
+                      price: formatTry(status.price_try_monthly, lang),
+                      date: new Intl.DateTimeFormat(lang, {
+                        dateStyle: "long",
+                      }).format(new Date(renewPost.until)),
+                    }),
+                    ...(status.subscribed === null
+                      ? [t("home.renewIfSubscribed")]
+                      : []),
+                  ].join(" ")}
+                  actions={
+                    <>
+                      <ChipButton onClick={onSubscribe}>
+                        {t("elchiPro.renew.cta")}
+                      </ChipButton>
+                      <GhostButton onClick={renewPost.snooze}>
+                        {t("elchiPro.renew.later")}
+                      </GhostButton>
+                    </>
+                  }
+                />
+              </section>
             )}
 
             {trialPost && (

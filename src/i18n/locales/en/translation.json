@@ -951,6 +951,16 @@
     "badge": {
       "trial_one": "Duyu Pro · {{count}} day",
       "trial_other": "Duyu Pro · {{count}} days"
+    },
+    "renew": {
+      "label": "Eshlik Pro subscription",
+      "title_one": "Your Eshlik Pro ends in {{count}} day.",
+      "title_other": "Your Eshlik Pro ends in {{count}} days.",
+      "detail": "Subscribe for {{price}} a month to keep Duyu Pro after {{date}}. Otherwise Eshlik switches to Duyu-small on this computer.",
+      "ifSubscribed": "Already subscribed? It renews by itself, so you can ignore this.",
+      "cta": "Subscribe",
+      "later": "Remind me tomorrow",
+      "failed": "Couldn't open the browser. You can subscribe at speech.patientdesk.ai/dashboard/billing."
     }
   },
   "dictionary": {
@@ -1079,6 +1089,10 @@
     "trialBodyFree": "After that you carry on free with Duyu-small, and can go Pro whenever you like; the first month is free.",
     "trialCta": "Go Pro",
     "dontShowAgain": "Don't show again",
+    "renewTitle_one": "{{count}} day left on your Eshlik Pro.",
+    "renewTitle_other": "{{count}} days left on your Eshlik Pro.",
+    "renewBody": "Subscribe for {{price}} a month to keep Duyu Pro after {{date}}; otherwise you carry on with Duyu-small on this computer.",
+    "renewIfSubscribed": "Already subscribed? It renews by itself, so you can skip this.",
     "learnedTitle": "New word: {{word}}.",
     "learnedHeard": "You fixed “{{heard}}”; I'll write it right from now on.",
     "learnedAdded": "Added to your dictionary.",
