@@ -290,6 +290,17 @@ async openElchiUpgrade() : Promise<Result<null, string>> {
 }
 },
 /**
+ * Opens the billing page to start the Elchi Pro subscription, and watches for it.
+ */
+async openElchiSubscribe() : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("open_elchi_subscribe") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+/**
  * Whether to use Duyu Pro when the plan includes it.
  */
 async setElchiUsePro(enabled: boolean) : Promise<ElchiProStatus> {
@@ -1509,7 +1520,11 @@ cloud_active: boolean; use_pro: boolean;
 /**
  * Whether dictated text is sent to the formatter.
  */
-format: boolean; trial_ends_at: string | null; pro_until: string | null; price_try_monthly: number; free_months: number }
+format: boolean; trial_ends_at: string | null; pro_until: string | null; price_try_monthly: number; free_months: number; 
+/**
+ * None when the server does not say (see `ElchiSession::subscribed`).
+ */
+subscribed: boolean | null }
 /**
  * The server's answer, cached in settings so the app knows its plan offline.
  */
@@ -1518,7 +1533,13 @@ export type ElchiSession = { plan: Plan; cloud: boolean; trial_ends_at: string |
  * For the formatter alone, on every plan. Absent from sessions cached
  * before formatting existed.
  */
-format_token?: SecretString | null; format_token_expires_at?: string | null; upgrade_url: string; price_try_monthly: number; free_months: number }
+format_token?: SecretString | null; format_token_expires_at?: string | null; upgrade_url: string; price_try_monthly: number; free_months: number; 
+/**
+ * Whether a Stripe subscription pays for Elchi Pro. None when the server
+ * does not say (it does not yet): then a subscriber's next renewal and a
+ * free month running out look the same, both just a `pro_until`.
+ */
+subscribed?: boolean | null }
 export type EngineType = 
 /**
  * Any GGML/GGUF model loaded through transcribe-cpp (Whisper, Parakeet,

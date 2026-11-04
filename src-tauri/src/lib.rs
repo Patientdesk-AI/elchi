@@ -811,6 +811,7 @@ pub fn run(cli_args: CliArgs) {
             commands::elchi_pro::get_elchi_pro_status,
             commands::elchi_pro::refresh_elchi_pro,
             commands::elchi_pro::open_elchi_upgrade,
+            commands::elchi_pro::open_elchi_subscribe,
             commands::elchi_pro::set_elchi_use_pro,
             commands::elchi_pro::set_elchi_format,
             dictionary::get_dictionary,

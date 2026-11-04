@@ -38,6 +38,18 @@ pub async fn open_elchi_upgrade(elchi: State<'_, Arc<ElchiPro>>) -> Result<(), S
         .map_err(|e| e.to_string())?
 }
 
+/// Opens the billing page to start the Elchi Pro subscription, and watches for it.
+#[tauri::command]
+#[specta::specta]
+pub async fn open_elchi_subscribe(elchi: State<'_, Arc<ElchiPro>>) -> Result<(), String> {
+    let elchi = elchi.inner().clone();
+    tauri::async_runtime::spawn_blocking(move || {
+        elchi.open_subscribe().map_err(|e| format!("{e:#}"))
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
+
 /// Whether to use Duyu Pro when the plan includes it.
 #[tauri::command]
 #[specta::specta]
