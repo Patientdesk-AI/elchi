@@ -1604,7 +1604,7 @@ checksum = "afea66474c4036a7e5fa4b072a3b0a09cd0b01f00134da3115d76b7cc5899f03"
 
 [[package]]
 name = "elchi"
-version = "1.0.8"
+version = "1.1.0"
 dependencies = [
  "anyhow",
  "chrono",
