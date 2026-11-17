@@ -45,8 +45,8 @@ const FORMAT_TIMEOUT: Duration = Duration::from_secs(6);
 const SESSION_TIMEOUT: Duration = Duration::from_secs(15);
 /// How often the plan is re-checked in the background.
 const REFRESH_EVERY: Duration = Duration::from_secs(3 * 60 * 60);
-/// After the upgrade page is opened, how often and how long to look for the
-/// activation, so the app switches to Pro within seconds.
+/// After the upgrade or billing page is opened, how often and how long to look
+/// for the activation or subscription, so the app shows it within seconds.
 const WATCH_EVERY: Duration = Duration::from_secs(5);
 const WATCH_FOR: Duration = Duration::from_secs(20 * 60);
 /// Refresh the token when it has less than this left.
@@ -78,6 +78,11 @@ pub struct ElchiSession {
     pub upgrade_url: String,
     pub price_try_monthly: u32,
     pub free_months: u32,
+    /// Whether a Stripe subscription pays for Elchi Pro. None when the server
+    /// does not say (it does not yet): then a subscriber's next renewal and a
+    /// free month running out look the same, both just a `pro_until`.
+    #[serde(default)]
+    pub subscribed: Option<bool>,
 }
 
 /// What the interface shows: the session without the token.
@@ -94,6 +99,8 @@ pub struct ElchiProStatus {
     pub pro_until: Option<String>,
     pub price_try_monthly: u32,
     pub free_months: u32,
+    /// None when the server does not say (see `ElchiSession::subscribed`).
+    pub subscribed: Option<bool>,
 }
 
 #[derive(Debug)]
@@ -246,6 +253,7 @@ impl ElchiPro {
             pro_until: session.and_then(|s| s.pro_until.clone()),
             price_try_monthly: session.map_or(200, |s| s.price_try_monthly),
             free_months: session.map_or(1, |s| s.free_months),
+            subscribed: session.and_then(|s| s.subscribed),
         }
     }
 
@@ -261,8 +269,17 @@ impl ElchiPro {
 
         let mut settings = get_settings(&self.app);
         let before = settings.elchi_session.as_ref().map(|s| s.plan);
+        let was_subscribed = settings
+            .elchi_session
+            .as_ref()
+            .is_some_and(|s| s.subscribed == Some(true));
         settings.elchi_session = Some(session.clone());
         write_settings(&self.app, settings);
+
+        if !was_subscribed && session.subscribed == Some(true) {
+            info!("Elchi Pro subscription started");
+            *self.watch_until.lock().unwrap() = None;
+        }
 
         if before != Some(session.plan) {
             info!("Eshlik plan: {:?} -> {:?}", before, session.plan);
@@ -357,10 +374,20 @@ impl ElchiPro {
         if !url.starts_with(&format!("{SITE_URL}/")) {
             bail!("unexpected upgrade URL");
         }
+        self.open_and_watch(&url)
+    }
+
+    /// Opens the billing page, where an Elchi Pro account starts its paid
+    /// subscription (the rest of the free month stays free), and watches for it.
+    pub fn open_subscribe(&self) -> Result<()> {
+        self.open_and_watch(&format!("{SITE_URL}/dashboard/billing"))
+    }
+
+    fn open_and_watch(&self, url: &str) -> Result<()> {
         use tauri_plugin_opener::OpenerExt;
         self.app
             .opener()
-            .open_url(&url, None::<&str>)
+            .open_url(url, None::<&str>)
             .map_err(|e| anyhow!("could not open the browser: {e}"))?;
         *self.watch_until.lock().unwrap() = Some(std::time::Instant::now() + WATCH_FOR);
         Ok(())
@@ -592,6 +619,7 @@ mod tests {
             upgrade_url: format!("{SITE_URL}/elchi/activate?code=x"),
             price_try_monthly: 200,
             free_months: 1,
+            subscribed: None,
         }
     }
 
@@ -696,5 +724,16 @@ mod tests {
         let w = wav_bytes(&[0.0, 0.5, -1.0, 2.0], 16_000).unwrap();
         assert_eq!(&w[..4], b"RIFF");
         assert_eq!(w.len(), 44 + 4 * 2);
+    }
+
+    #[test]
+    fn subscribed_is_unknown_until_the_server_says() {
+        let mut v = serde_json::to_value(session(true, Some("t"), 3600)).unwrap();
+        v.as_object_mut().unwrap().remove("subscribed");
+        let old: ElchiSession = serde_json::from_value(v.clone()).unwrap();
+        assert_eq!(old.subscribed, None);
+        v["subscribed"] = serde_json::json!(true);
+        let new: ElchiSession = serde_json::from_value(v).unwrap();
+        assert_eq!(new.subscribed, Some(true));
     }
 }

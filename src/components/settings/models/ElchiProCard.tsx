@@ -2,19 +2,23 @@ import React, { useId, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { SpectralCanvas } from "../../ui/SpectralCanvas";
 import { Switch } from "../../ui/Switch";
-import { daysLeft, useElchiPro } from "@/hooks/useElchiPro";
+import { daysLeft, useElchiPro, useRenewalReminder } from "@/hooks/useElchiPro";
 import "./models.css";
 
 /**
  * Duyu Pro, the cloud model, as the page's one total-blue zone: the pixel
  * field on the right fading into flat blue under the text. During the trial
  * and on the free plan it carries the upgrade; with Eshlik Pro it shows the
- * subscription instead. The "use Duyu Pro" switch sits in a frosted tile at
+ * subscription instead, and in its last days the button to keep it (this
+ * card is where the plan lives, so a snoozed reminder still shows the
+ * button here). The "use Duyu Pro" switch sits in a frosted tile at
  * the bottom of the zone whenever the plan includes the cloud.
  */
 export const ElchiProCard: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const { status, upgrade, setUsePro } = useElchiPro();
+  const { status, upgrade, subscribe, setUsePro } = useElchiPro();
+  // Snoozing is for the banner and the Home post; the card ignores it.
+  const renewal = useRenewalReminder(status, { ignoreSnooze: true });
   const [error, setError] = useState<string | null>(null);
   const titleId = useId();
   const tileDescId = useId();
@@ -40,6 +44,15 @@ export const ElchiProCard: React.FC = () => {
       await upgrade();
     } catch {
       setError(t("elchiPro.upgradeFailed"));
+    }
+  };
+
+  const onSubscribe = async () => {
+    setError(null);
+    try {
+      await subscribe();
+    } catch {
+      setError(t("elchiPro.renew.failed"));
     }
   };
 
@@ -101,15 +114,33 @@ export const ElchiProCard: React.FC = () => {
         )}
 
         {plan === "pro" ? (
-          <p className="mt-1 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.04em] text-white/85">
-            <span
-              aria-hidden="true"
-              className="h-1.5 w-1.5 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]"
-            />
-            {proUntil
-              ? t("settings.models.pro.activeUntil", { date: proUntil })
-              : t("settings.models.pro.active")}
-          </p>
+          <>
+            <p className="mt-1 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.04em] text-white/85">
+              <span
+                aria-hidden="true"
+                className="h-1.5 w-1.5 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]"
+              />
+              {proUntil
+                ? t("settings.models.pro.activeUntil", { date: proUntil })
+                : t("settings.models.pro.active")}
+            </p>
+            {renewal && (
+              <div className="flex flex-wrap items-center gap-x-3.5 gap-y-2">
+                <button
+                  type="button"
+                  onClick={onSubscribe}
+                  className="chrome-cta px-3.5 py-[9px] text-[13px] leading-none focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-accent"
+                >
+                  {t("elchiPro.renew.cta")}
+                </button>
+                <span className="max-w-[340px] text-[12.5px] leading-normal text-white/80">
+                  {t("elchiPro.renew.title", { count: renewal.days })}
+                  {status.subscribed === null &&
+                    ` ${t("elchiPro.renew.ifSubscribed")}`}
+                </span>
+              </div>
+            )}
+          </>
         ) : (
           <div className="mt-1 flex flex-wrap items-center gap-x-3.5 gap-y-2">
             <button

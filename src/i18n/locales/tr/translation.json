@@ -951,6 +951,16 @@
     "badge": {
       "trial_one": "Duyu Pro · {{count}} gün",
       "trial_other": "Duyu Pro · {{count}} gün"
+    },
+    "renew": {
+      "label": "Eshlik Pro aboneliği",
+      "title_one": "Eshlik Pro'nuz {{count}} gün sonra bitiyor.",
+      "title_other": "Eshlik Pro'nuz {{count}} gün sonra bitiyor.",
+      "detail": "Duyu Pro ile devam etmek için ayda {{price}} karşılığında abone olun. Abone olmazsanız {{date}} tarihinden sonra Eshlik bu bilgisayarda Duyu-small ile çalışır.",
+      "ifSubscribed": "Zaten abone olduysanız aboneliğiniz kendiliğinden yenilenir; bu mesajı dikkate almayın.",
+      "cta": "Abone ol",
+      "later": "Yarın hatırlat",
+      "failed": "Tarayıcı açılamadı. speech.patientdesk.ai/dashboard/billing adresinden abone olabilirsiniz."
     }
   },
   "dictionary": {
@@ -1079,6 +1089,10 @@
     "trialBodyFree": "Sonra Duyu-small ile ücretsiz devam edersin — isteyince Pro'ya geçersin, ilk ay ücretsiz.",
     "trialCta": "Pro'ya geç",
     "dontShowAgain": "Bir daha gösterme",
+    "renewTitle_one": "Eshlik Pro'nun bitmesine {{count}} gün kaldı.",
+    "renewTitle_other": "Eshlik Pro'nun bitmesine {{count}} gün kaldı.",
+    "renewBody": "Duyu Pro ile devam etmek için ayda {{price}} karşılığında abone ol; olmazsan {{date}} sonrasında Duyu-small ile bu bilgisayarda devam edersin.",
+    "renewIfSubscribed": "Zaten abone olduysan aboneliğin kendiliğinden yenilenir, bunu geçebilirsin.",
     "learnedTitle": "Yeni kelime: {{word}}.",
     "learnedHeard": "“{{heard}}” diye yazdığımı düzelttin; artık doğru yazacağım.",
     "learnedAdded": "Sözlüğe ekledim.",
